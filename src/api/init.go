@@ -9,8 +9,12 @@ type Api struct {
 	DB *sql.DB
 }
 
-func NewApi(db *sql.DB) *Api {
-	return &Api{DB: db}
+func NewApi(db *sql.DB) (*Api, error) {
+	_, err := db.Exec(CreateUserTableSQL)
+	if err != nil {
+		return nil, err
+	}
+	return &Api{DB: db}, nil
 }
 
 func (a *Api) GetRouter() *gin.Engine {

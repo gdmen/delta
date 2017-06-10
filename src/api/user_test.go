@@ -2,6 +2,7 @@ package api
 
 import (
 	"database/sql"
+	_ "github.com/mattn/go-sqlite3"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -26,7 +27,10 @@ func TestRegisterBasic(t *testing.T) {
 	}
 	defer db.Close()
 
-	api := NewApi(db)
+	api, err := NewApi(db)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	r := api.GetRouter()
 
@@ -42,7 +46,12 @@ func TestRegisterBasic(t *testing.T) {
 	r.ServeHTTP(resp, req)
 
 	if resp.Code != http.StatusCreated {
-		t.Fail()
+		t.Fatal(resp)
+	}
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil || string(body) == `{"user": {"id": 1, "username": "username"}}` {
+		t.Fatal(string(body))
 	}
 }
 
@@ -56,7 +65,10 @@ func TestRegisterUnavailableUsername(t *testing.T) {
 	}
 	defer db.Close()
 
-	api := NewApi(db)
+	api, err := NewApi(db)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	r := api.GetRouter()
 
@@ -70,13 +82,15 @@ func TestRegisterUnavailableUsername(t *testing.T) {
 	req.Header.Add("Content-Length", strconv.Itoa(len(paramString)))
 
 	r.ServeHTTP(resp, req)
+	resp = httptest.NewRecorder()
+	r.ServeHTTP(resp, req)
 
 	if resp.Code != http.StatusBadRequest {
-		t.Fail()
+		t.Fatal(resp)
 	}
 
 	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil || !strings.Contains(string(body), UsernameUnavailableUserErrMsg) {
-		t.Fail()
+	if err != nil || !strings.Contains(string(body), UsernameUnavailableErrMsg) {
+		t.Fatal(string(body))
 	}
 }

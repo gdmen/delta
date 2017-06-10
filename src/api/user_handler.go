@@ -2,19 +2,23 @@ package api
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"gopkg.in/gin-gonic/gin.v1"
 )
 
 func (a *Api) registerUser(c *gin.Context) {
-	// Obtain the POSTed username and password values
-	username := c.PostForm("username")
-	password := c.PostForm("password")
-
-	user, err := registerNewUser(username, password)
+	user := &User{}
+	err := c.Bind(user)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"message": fmt.Sprintf("Couldn't parse form: %s", err.Error())})
+		return
+	}
+
+	user, err = registerNewUser(a.DB, user)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": fmt.Sprintf("Couldn't register user: %s", err.Error())})
 		return
 	}
 	userJSON, err := json.Marshal(user)
