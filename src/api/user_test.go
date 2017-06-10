@@ -50,7 +50,10 @@ func TestRegisterBasic(t *testing.T) {
 	}
 
 	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil || string(body) == `{"user": {"id": 1, "username": "username"}}` {
+	if err != nil {
+		t.Fatal(err)
+	}
+	if strings.TrimSpace(string(body)) != "{\"user\":{\"id\":1,\"username\":\"u1\"}}" {
 		t.Fatal(string(body))
 	}
 }

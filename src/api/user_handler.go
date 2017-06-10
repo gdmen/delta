@@ -1,7 +1,6 @@
 package api
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 
@@ -21,11 +20,6 @@ func (a *Api) registerUser(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"message": fmt.Sprintf("Couldn't register user: %s", err.Error())})
 		return
 	}
-	userJSON, err := json.Marshal(user)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
-		return
-	}
-	c.JSON(http.StatusCreated, gin.H{"user": userJSON})
+	c.JSON(http.StatusCreated, gin.H{"user": user})
 	return
 }
