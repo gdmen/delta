@@ -7,7 +7,7 @@ import (
 	"gopkg.in/gin-gonic/gin.v1"
 )
 
-func registerUser(c *gin.Context) {
+func (a *Api) registerUser(c *gin.Context) {
 	// Obtain the POSTed username and password values
 	username := c.PostForm("username")
 	password := c.PostForm("password")

@@ -1,6 +1,9 @@
 # Project binaries
 bin/
 
+# Database files
+*.db
+
 # Binaries for programs and plugins
 *.exe
 *.dll

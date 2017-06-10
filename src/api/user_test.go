@@ -1,19 +1,34 @@
 package api
 
 import (
+	"database/sql"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"os"
 	"strconv"
 	"strings"
 	"testing"
 )
 
+const (
+	TestDB = "./test.db"
+)
+
 func TestRegisterBasic(t *testing.T) {
 	resp := httptest.NewRecorder()
 
-	r := GetRouterV1()
+	os.Remove(TestDB)
+	db, err := sql.Open("sqlite3", TestDB)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer db.Close()
+
+	api := NewApi(db)
+
+	r := api.GetRouter()
 
 	values := url.Values{}
 	values.Add("username", "u1")
@@ -34,7 +49,16 @@ func TestRegisterBasic(t *testing.T) {
 func TestRegisterUnavailableUsername(t *testing.T) {
 	resp := httptest.NewRecorder()
 
-	r := GetRouterV1()
+	os.Remove(TestDB)
+	db, err := sql.Open("sqlite3", TestDB)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer db.Close()
+
+	api := NewApi(db)
+
+	r := api.GetRouter()
 
 	values := url.Values{}
 	values.Add("username", "username")
