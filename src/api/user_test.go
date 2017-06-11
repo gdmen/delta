@@ -93,7 +93,7 @@ func TestRegisterUnavailableUsername(t *testing.T) {
 	}
 
 	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil || !strings.Contains(string(body), UsernameUnavailableErrMsg) {
+	if err != nil || !strings.Contains(string(body), "Username isn't available") {
 		t.Fatal(string(body))
 	}
 }

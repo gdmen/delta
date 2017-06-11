@@ -9,14 +9,6 @@ import (
 	"gopkg.in/gin-gonic/gin.v1"
 )
 
-const (
-	CouldNotParseFormErrMsg     = "Couldn't parse input form"
-	UsernameUnavailableErrMsg   = "Username isn't available"
-	CouldNotHashPasswordErrMsg  = "Couldn't hash password"
-	CouldNotInsertUserErrMsg    = "Couldn't add user to database"
-	InternalConfigurationErrMsg = "Internal configuration mishap"
-)
-
 func (a *Api) registerUser(c *gin.Context) {
 	rid := GetRequestId(c)
 	fcn := GetFuncName()
@@ -24,8 +16,9 @@ func (a *Api) registerUser(c *gin.Context) {
 	user := &User{}
 	err := c.Bind(user)
 	if err != nil {
-		glog.Errorf("[rid=%s | fcn=%s] %s: %v", rid, fcn, CouldNotParseFormErrMsg, err)
-		c.JSON(http.StatusBadRequest, gin.H{"message": CouldNotParseFormErrMsg})
+		msg := "Couldn't parse input form"
+		glog.Errorf("[rid=%s | fcn=%s] %s: %v", rid, fcn, msg, err)
+		c.JSON(http.StatusBadRequest, gin.H{"message": msg})
 		return
 	}
 	glog.Infof("[rid=%s | fcn=%s] Username: %s", rid, fcn, user.Username)
@@ -33,8 +26,9 @@ func (a *Api) registerUser(c *gin.Context) {
 	// Salt and hash password
 	hashedPass, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
 	if err != nil {
-		glog.Errorf("[rid=%s | fcn=%s] %s: %v", rid, fcn, CouldNotHashPasswordErrMsg, err)
-		c.JSON(http.StatusInternalServerError, gin.H{"message": CouldNotHashPasswordErrMsg})
+		msg := "Couldn't hash password"
+		glog.Errorf("[rid=%s | fcn=%s] %s: %v", rid, fcn, msg, err)
+		c.JSON(http.StatusInternalServerError, gin.H{"message": msg})
 		return
 	}
 
@@ -42,20 +36,23 @@ func (a *Api) registerUser(c *gin.Context) {
 	result, err := a.DB.Exec(InsertUserSQL, user.Username, hashedPass)
 	if err != nil {
 		if strings.Contains(err.Error(), "UNIQUE constraint failed") {
-			glog.Errorf("[rid=%s | fcn=%s] %s: %v", rid, fcn, UsernameUnavailableErrMsg, err)
-			c.JSON(http.StatusBadRequest, gin.H{"message": UsernameUnavailableErrMsg})
+			msg := "Username isn't available"
+			glog.Errorf("[rid=%s | fcn=%s] %s: %v", rid, fcn, msg, err)
+			c.JSON(http.StatusBadRequest, gin.H{"message": msg})
 			return
 		}
-		glog.Errorf("[rid=%s | fcn=%s] %s: %v", rid, fcn, CouldNotInsertUserErrMsg, err)
-		c.JSON(http.StatusInternalServerError, gin.H{"message": CouldNotInsertUserErrMsg})
+		msg := "Couldn't add user to database"
+		glog.Errorf("[rid=%s | fcn=%s] %s: %v", rid, fcn, msg, err)
+		c.JSON(http.StatusInternalServerError, gin.H{"message": msg})
 		return
 	}
 	// Get the User.Id that was just auto-written to the database
 	id, err := result.LastInsertId()
 	if err != nil {
 		// If the db doesn't support LastInsertId(), throw an error for now
-		glog.Errorf("[rid=%s | fcn=%s] %s: %v", rid, fcn, InternalConfigurationErrMsg, err)
-		c.JSON(http.StatusInternalServerError, gin.H{"message": InternalConfigurationErrMsg})
+		msg := "Internal configuration mishap"
+		glog.Errorf("[rid=%s | fcn=%s] %s: %v", rid, fcn, msg, err)
+		c.JSON(http.StatusInternalServerError, gin.H{"message": msg})
 		return
 	}
 	user.Id = id
