@@ -24,7 +24,7 @@ func (a *Api) GetRouter() *gin.Engine {
 	{
 		user := v1.Group("/u")
 		{
-			user.POST("/register", ensureNotLoggedIn(), a.registerUser)
+			user.POST("/register", RequestIdMiddleware(), ensureNotLoggedIn(), a.registerUser)
 		}
 	}
 	return router

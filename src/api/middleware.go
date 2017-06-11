@@ -1,10 +1,22 @@
 package api
 
 import (
-	"net/http"
-
+	"github.com/satori/go.uuid"
 	"gopkg.in/gin-gonic/gin.v1"
+	"net/http"
 )
+
+const (
+	RequestIdKey = "X-Request-Id"
+)
+
+func RequestIdMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		rid := uuid.NewV4().String()
+		c.Set(RequestIdKey, rid)
+		c.Header(RequestIdKey, rid)
+	}
+}
 
 // This middleware ensures that a request will be aborted with an error
 // if the user is not logged in
