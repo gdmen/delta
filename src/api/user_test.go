@@ -2,6 +2,7 @@ package api
 
 import (
 	"database/sql"
+	"fmt"
 	_ "github.com/mattn/go-sqlite3"
 	"io/ioutil"
 	"net/http"
@@ -17,26 +18,51 @@ const (
 	TestDB = "./test.db"
 )
 
-func TestRegisterBasic(t *testing.T) {
-	resp := httptest.NewRecorder()
+var api *Api
 
+func resetTestDB(t *testing.T) {
+	var err error
+	users := []User{
+		// username, password
+		User{Id: 1, Username: "username", Password: "$2a$10$UMBNySrXiZgARiK1l9m/F.ACV2MBOQPAglYluAHdBqsZBdahmMCTm"},
+	}
+	if _, err = api.DB.Exec(`delete from users;`); err != nil {
+		t.Fatalf("Failed to delete users table: %v", err)
+	}
+	for _, u := range users {
+		if _, err = api.DB.Exec(`insert into users(id, username, password) values(?, ?, ?);`, u.Id, u.Username, u.Password); err != nil {
+			t.Fatalf("Failed to insert user(%d, %s, %s): %v", u.Id, u.Username, u.Password, err)
+		}
+	}
+}
+
+// Set up a global test db and clean up after running all tests
+func TestMain(m *testing.M) {
 	os.Remove(TestDB)
 	db, err := sql.Open("sqlite3", TestDB)
 	if err != nil {
-		t.Fatal(err)
+		fmt.Errorf("Couldn't create db: %v", err)
+		os.Exit(1)
 	}
-	defer db.Close()
-
-	api, err := NewApi(db)
+	api, err = NewApi(db)
 	if err != nil {
-		t.Fatal(err)
+		fmt.Errorf("Couldn't init Api: %v", err)
+		os.Exit(1)
 	}
+	ret := m.Run()
+	db.Close()
+	os.Exit(ret)
+}
+
+func TestRegisterBasic(t *testing.T) {
+	resetTestDB(t)
+	resp := httptest.NewRecorder()
 
 	r := api.GetRouter()
 
 	values := url.Values{}
-	values.Add("username", "u1")
-	values.Add("password", "p1")
+	values.Add("username", "newusername")
+	values.Add("password", "pw")
 	paramString := values.Encode()
 
 	req, _ := http.NewRequest("POST", "/api/v1/u/register", strings.NewReader(paramString))
@@ -53,39 +79,26 @@ func TestRegisterBasic(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if strings.TrimSpace(string(body)) != "{\"user\":{\"id\":1,\"username\":\"u1\"}}" {
+	if strings.TrimSpace(string(body)) != "{\"user\":{\"id\":2,\"username\":\"newusername\"}}" {
 		t.Fatal(string(body))
 	}
 }
 
 func TestRegisterUnavailableUsername(t *testing.T) {
+	resetTestDB(t)
 	resp := httptest.NewRecorder()
-
-	os.Remove(TestDB)
-	db, err := sql.Open("sqlite3", TestDB)
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer db.Close()
-
-	api, err := NewApi(db)
-	if err != nil {
-		t.Fatal(err)
-	}
 
 	r := api.GetRouter()
 
 	values := url.Values{}
 	values.Add("username", "username")
-	values.Add("password", "password")
+	values.Add("password", "pw")
 	paramString := values.Encode()
 
 	req, _ := http.NewRequest("POST", "/api/v1/u/register", strings.NewReader(paramString))
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 	req.Header.Add("Content-Length", strconv.Itoa(len(paramString)))
 
-	r.ServeHTTP(resp, req)
-	resp = httptest.NewRecorder()
 	r.ServeHTTP(resp, req)
 
 	if resp.Code != http.StatusBadRequest {
