@@ -1,4 +1,5 @@
-- Add rest of user management system (login & logout)
-- Better session system
+- Hardcoded API token for writes
 
-- Middleware for filtering resources
+- Add failure case unit tests
+
+- Add Measurement model
