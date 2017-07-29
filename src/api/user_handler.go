@@ -10,24 +10,23 @@ import (
 )
 
 func (a *Api) registerUser(c *gin.Context) {
-	rid := GetRequestId(c)
-	fcn := GetFuncName()
-	glog.Infof("[rid=%s | fcn=%s] registerUser", rid, fcn)
+	logPrefix := GetLogPrefix(c)
+	glog.Infof("%s fcn start", logPrefix)
 	user := &User{}
 	err := c.Bind(user)
 	if err != nil {
 		msg := "Couldn't parse input form"
-		glog.Errorf("[rid=%s | fcn=%s] %s: %v", rid, fcn, msg, err)
+		glog.Errorf("%s %s: %v", logPrefix, msg, err)
 		c.JSON(http.StatusBadRequest, gin.H{"message": msg})
 		return
 	}
-	glog.Infof("[rid=%s | fcn=%s] Username: %s", rid, fcn, user.Username)
+	glog.Infof("%s Username: %s", logPrefix, user.Username)
 
 	// Salt and hash password
 	hashedPass, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
 	if err != nil {
 		msg := "Couldn't hash password"
-		glog.Errorf("[rid=%s | fcn=%s] %s: %v", rid, fcn, msg, err)
+		glog.Errorf("%s %s: %v", logPrefix, msg, err)
 		c.JSON(http.StatusInternalServerError, gin.H{"message": msg})
 		return
 	}
@@ -37,12 +36,12 @@ func (a *Api) registerUser(c *gin.Context) {
 	if err != nil {
 		if strings.Contains(err.Error(), "UNIQUE constraint failed") {
 			msg := "Username isn't available"
-			glog.Errorf("[rid=%s | fcn=%s] %s: %v", rid, fcn, msg, err)
+			glog.Errorf("%s %s: %v", logPrefix, msg, err)
 			c.JSON(http.StatusBadRequest, gin.H{"message": msg})
 			return
 		}
 		msg := "Couldn't add user to database"
-		glog.Errorf("[rid=%s | fcn=%s] %s: %v", rid, fcn, msg, err)
+		glog.Errorf("%s %s: %v", logPrefix, msg, err)
 		c.JSON(http.StatusInternalServerError, gin.H{"message": msg})
 		return
 	}
@@ -51,14 +50,14 @@ func (a *Api) registerUser(c *gin.Context) {
 	if err != nil {
 		// If the db doesn't support LastInsertId(), throw an error for now
 		msg := "Internal configuration mishap"
-		glog.Errorf("[rid=%s | fcn=%s] %s: %v", rid, fcn, msg, err)
+		glog.Errorf("%s %s: %v", logPrefix, msg, err)
 		c.JSON(http.StatusInternalServerError, gin.H{"message": msg})
 		return
 	}
 	user.Id = id
 	user.Password = ""
 
-	glog.Infof("[rid=%s | fcn=%s] Success: %+v", rid, fcn, user)
+	glog.Infof("%s Success: %+v", logPrefix, user)
 	c.JSON(http.StatusCreated, gin.H{"user": user})
 	return
 }

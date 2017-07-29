@@ -9,7 +9,7 @@ type User struct {
 const (
 	CreateUserTableSQL = `
 create table users (
-	id int auto_increment primary key,
+	id integer primary key,
 	username varchar not null,
 	password varchar not null,
 	constraint username unique (username)
