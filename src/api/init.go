@@ -6,7 +6,6 @@ import (
 )
 
 var CREATE_TABLES_SQL = []string{
-	CreateUserTableSQL,
 	CreateMeasurementTypeTableSQL,
 }
 
@@ -29,10 +28,6 @@ func (a *Api) GetRouter() *gin.Engine {
 
 	v1 := router.Group("/api/v1")
 	{
-		user := v1.Group("/users")
-		{
-			user.POST("/register", RequestIdMiddleware(), ensureNotLoggedIn(), a.registerUser)
-		}
 		measurementType := v1.Group("/measurement_types")
 		{
 			measurementType.POST("/", RequestIdMiddleware(), a.createMeasurementType)

@@ -12,7 +12,6 @@ import (
 )
 
 func TestMeasurementTypeBasic(t *testing.T) {
-	resetTestDB(t)
 	r := api.GetRouter()
 
 	// Create

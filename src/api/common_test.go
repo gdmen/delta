@@ -15,22 +15,6 @@ const (
 
 var api *Api
 
-func resetTestDB(t *testing.T) {
-	var err error
-	users := []User{
-		// username, password
-		User{Username: "username", Password: "$2a$10$UMBNySrXiZgARiK1l9m/F.ACV2MBOQPAglYluAHdBqsZBdahmMCTm"},
-	}
-	if _, err = api.DB.Exec(`delete from users;`); err != nil {
-		t.Fatalf("Failed to delete users table: %v", err)
-	}
-	for _, u := range users {
-		if _, err = api.DB.Exec(InsertUserSQL, u.Username, u.Password); err != nil {
-			t.Fatalf("Failed to insert user(%s, %s): %v", u.Username, u.Password, err)
-		}
-	}
-}
-
 // Set up a global test db and clean up after running all tests
 func TestMain(m *testing.M) {
 	flag.Set("alsologtostderr", "true")
@@ -49,6 +33,6 @@ func TestMain(m *testing.M) {
 	}
 	ret := m.Run()
 	db.Close()
-	//os.Remove(TestDB)
+	os.Remove(TestDB)
 	os.Exit(ret)
 }
