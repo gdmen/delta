@@ -2,21 +2,19 @@ package api
 
 import (
 	"database/sql"
-	"fmt"
 	"github.com/golang/glog"
 	"net/http"
 	"strconv"
-	"strings"
 
 	"gopkg.in/gin-gonic/gin.v1"
 )
 
-func (a *Api) createMeasurementType(c *gin.Context) {
+func (a *Api) createMeasurement(c *gin.Context) {
 	logPrefix := GetLogPrefix(c)
 	glog.Infof("%s fcn start", logPrefix)
 
 	// Parse input
-	model := &MeasurementType{}
+	model := &Measurement{}
 	err := c.Bind(model)
 	if err != nil {
 		msg := "Couldn't parse input form"
@@ -27,15 +25,9 @@ func (a *Api) createMeasurementType(c *gin.Context) {
 	glog.Infof("%s %s", logPrefix, model)
 
 	// Write to database
-	result, err := a.DB.Exec(CreateMeasurementTypeSQL, model.Name, model.Units)
+	result, err := a.DB.Exec(CreateMeasurementSQL, model.MeasurementTypeId, model.Value, model.Repetitions, model.StartTime, model.Duration, model.DataSource)
 	if err != nil {
-		if strings.Contains(err.Error(), "UNIQUE constraint failed") {
-			msg := fmt.Sprintf("The Name '%s' already exists", model.Name)
-			glog.Errorf("%s %s: %v", logPrefix, msg, err)
-			c.JSON(http.StatusBadRequest, gin.H{"message": msg})
-			return
-		}
-		msg := "Couldn't add measurement_type to database"
+		msg := "Couldn't add measurement to database"
 		glog.Errorf("%s %s: %v", logPrefix, msg, err)
 		c.JSON(http.StatusInternalServerError, gin.H{"message": msg})
 		return
@@ -52,11 +44,11 @@ func (a *Api) createMeasurementType(c *gin.Context) {
 	model.Id = id
 
 	glog.Infof("%s Success: %+v", logPrefix, model)
-	c.JSON(http.StatusCreated, gin.H{"measurement_type": model})
+	c.JSON(http.StatusCreated, gin.H{"measurement": model})
 	return
 }
 
-func (a *Api) updateMeasurementType(c *gin.Context) {
+func (a *Api) updateMeasurement(c *gin.Context) {
 	logPrefix := GetLogPrefix(c)
 	glog.Infof("%s fcn start", logPrefix)
 
@@ -68,7 +60,7 @@ func (a *Api) updateMeasurementType(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{"message": msg})
 		return
 	}
-	model := &MeasurementType{}
+	model := &Measurement{}
 	err = c.Bind(model)
 	if err != nil {
 		msg := "Couldn't parse input form"
@@ -80,21 +72,21 @@ func (a *Api) updateMeasurementType(c *gin.Context) {
 	glog.Infof("%s %s", logPrefix, model)
 
 	// Write to database
-	_, err = a.DB.Exec(UpdateMeasurementTypeSQL, model.Name, model.Units, model.Id)
+	_, err = a.DB.Exec(UpdateMeasurementSQL, model.MeasurementTypeId, model.Value, model.Repetitions, model.StartTime, model.Duration, model.DataSource, model.Id)
 	// TODO(gary): add 404
 	if err != nil {
-		msg := "Couldn't update measurement_type in database"
+		msg := "Couldn't update measurement in database"
 		glog.Errorf("%s %s: %v", logPrefix, msg, err)
 		c.JSON(http.StatusInternalServerError, gin.H{"message": msg})
 		return
 	}
 
 	glog.Infof("%s Success: %+v", logPrefix, model)
-	c.JSON(http.StatusOK, gin.H{"measurement_type": model})
+	c.JSON(http.StatusOK, gin.H{"measurement": model})
 	return
 }
 
-func (a *Api) deleteMeasurementType(c *gin.Context) {
+func (a *Api) deleteMeasurement(c *gin.Context) {
 	logPrefix := GetLogPrefix(c)
 	glog.Infof("%s fcn start", logPrefix)
 
@@ -108,10 +100,10 @@ func (a *Api) deleteMeasurementType(c *gin.Context) {
 	}
 
 	// Write to database
-	_, err = a.DB.Exec(DeleteMeasurementTypeSQL, paramId)
+	_, err = a.DB.Exec(DeleteMeasurementSQL, paramId)
 	// TODO(gary): add 404
 	if err != nil {
-		msg := "Couldn't delete measurement_type in database"
+		msg := "Couldn't delete measurement in database"
 		glog.Errorf("%s %s: %v", logPrefix, msg, err)
 		c.JSON(http.StatusInternalServerError, gin.H{"message": msg})
 		return
@@ -122,7 +114,7 @@ func (a *Api) deleteMeasurementType(c *gin.Context) {
 	return
 }
 
-func (a *Api) getMeasurementType(c *gin.Context) {
+func (a *Api) getMeasurement(c *gin.Context) {
 	logPrefix := GetLogPrefix(c)
 	glog.Infof("%s fcn start", logPrefix)
 
@@ -136,42 +128,42 @@ func (a *Api) getMeasurementType(c *gin.Context) {
 	}
 
 	// Read from database
-	model := MeasurementType{}
-	err = a.DB.QueryRow(GetMeasurementTypeSQL, paramId).Scan(&model.Id, &model.Name, &model.Units)
+	model := Measurement{}
+	err = a.DB.QueryRow(GetMeasurementSQL, paramId).Scan(&model.Id, &model.MeasurementTypeId, &model.Value, &model.Repetitions, &model.StartTime, &model.Duration, &model.DataSource)
 	if err == sql.ErrNoRows {
-		msg := "Couldn't find a measurement_type with that Id"
+		msg := "Couldn't find a measurement with that Id"
 		glog.Errorf("%s %s: %v", logPrefix, msg, err)
 		c.JSON(http.StatusNotFound, gin.H{"message": msg})
 		return
 	} else if err != nil {
-		msg := "Couldn't get measurement_type from database"
+		msg := "Couldn't get measurement from database"
 		glog.Errorf("%s %s: %v", logPrefix, msg, err)
 		c.JSON(http.StatusInternalServerError, gin.H{"message": msg})
 		return
 	}
 
 	glog.Infof("%s Success: %+v", logPrefix, model)
-	c.JSON(http.StatusOK, gin.H{"measurement_type": model})
+	c.JSON(http.StatusOK, gin.H{"measurement": model})
 	return
 }
 
-func (a *Api) listMeasurementType(c *gin.Context) {
+func (a *Api) listMeasurement(c *gin.Context) {
 	logPrefix := GetLogPrefix(c)
 	glog.Infof("%s fcn start", logPrefix)
 
 	// Read from database
-	rows, err := a.DB.Query(ListMeasurementTypeSQL)
+	rows, err := a.DB.Query(ListMeasurementSQL)
 	if err != nil {
-		msg := "Couldn't get measurement_types from database"
+		msg := "Couldn't get measurements from database"
 		glog.Errorf("%s %s: %v", logPrefix, msg, err)
 		c.JSON(http.StatusInternalServerError, gin.H{"message": msg})
 		return
 	}
 	defer rows.Close()
-	models := []MeasurementType{}
+	models := []Measurement{}
 	for rows.Next() {
-		model := MeasurementType{}
-		err = rows.Scan(&model.Id, &model.Name, &model.Units)
+		model := Measurement{}
+		err = rows.Scan(&model.Id, &model.MeasurementTypeId, &model.Value, &model.Repetitions, &model.StartTime, &model.Duration, &model.DataSource)
 		if err != nil {
 			msg := "Couldn't scan row from database"
 			glog.Infof("%s %s: %v", logPrefix, msg, err)
@@ -188,6 +180,6 @@ func (a *Api) listMeasurementType(c *gin.Context) {
 	}
 
 	glog.Infof("%s Success: %+v", logPrefix, models)
-	c.JSON(http.StatusOK, gin.H{"measurement_types": models})
+	c.JSON(http.StatusOK, gin.H{"measurements": models})
 	return
 }

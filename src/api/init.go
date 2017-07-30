@@ -7,6 +7,7 @@ import (
 
 var CREATE_TABLES_SQL = []string{
 	CreateMeasurementTypeTableSQL,
+	CreateMeasurementTableSQL,
 }
 
 type Api struct {
@@ -35,6 +36,14 @@ func (a *Api) GetRouter() *gin.Engine {
 			measurementType.DELETE("/:id", RequestIdMiddleware(), a.deleteMeasurementType)
 			measurementType.GET("/:id", RequestIdMiddleware(), a.getMeasurementType)
 			measurementType.GET("/", RequestIdMiddleware(), a.listMeasurementType)
+		}
+		measurement := v1.Group("/measurements")
+		{
+			measurement.POST("/", RequestIdMiddleware(), a.createMeasurement)
+			measurement.POST("/:id", RequestIdMiddleware(), a.updateMeasurement)
+			measurement.DELETE("/:id", RequestIdMiddleware(), a.deleteMeasurement)
+			measurement.GET("/:id", RequestIdMiddleware(), a.getMeasurement)
+			measurement.GET("/", RequestIdMiddleware(), a.listMeasurement)
 		}
 	}
 	return router
