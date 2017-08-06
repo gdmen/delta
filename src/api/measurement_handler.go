@@ -1,7 +1,6 @@
 package api
 
 import (
-	"database/sql"
 	"github.com/golang/glog"
 	"net/http"
 	"strconv"
@@ -25,26 +24,16 @@ func (a *Api) createMeasurement(c *gin.Context) {
 	glog.Infof("%s %s", logPrefix, model)
 
 	// Write to database
-	result, err := a.DB.Exec(CreateMeasurementSQL, model.MeasurementTypeId, model.Value, model.Repetitions, model.StartTime, model.Duration, model.DataSource)
+	manager := &MeasurementManager{DB: a.DB}
+	status, msg, err := manager.Create(model)
 	if err != nil {
-		msg := "Couldn't add measurement to database"
 		glog.Errorf("%s %s: %v", logPrefix, msg, err)
-		c.JSON(http.StatusInternalServerError, gin.H{"message": msg})
+		c.JSON(status, gin.H{"message": msg})
 		return
 	}
-	// Get the Id that was just auto-written to the database
-	id, err := result.LastInsertId()
-	if err != nil {
-		// If the db doesn't support LastInsertId(), throw an error for now
-		msg := "Internal configuration mishap"
-		glog.Errorf("%s %s: %v", logPrefix, msg, err)
-		c.JSON(http.StatusInternalServerError, gin.H{"message": msg})
-		return
-	}
-	model.Id = id
 
 	glog.Infof("%s Success: %+v", logPrefix, model)
-	c.JSON(http.StatusCreated, gin.H{"measurement": model})
+	c.JSON(status, gin.H{"measurement": model})
 	return
 }
 
@@ -72,17 +61,16 @@ func (a *Api) updateMeasurement(c *gin.Context) {
 	glog.Infof("%s %s", logPrefix, model)
 
 	// Write to database
-	_, err = a.DB.Exec(UpdateMeasurementSQL, model.MeasurementTypeId, model.Value, model.Repetitions, model.StartTime, model.Duration, model.DataSource, model.Id)
-	// TODO(gary): add 404
+	manager := &MeasurementManager{DB: a.DB}
+	status, msg, err := manager.Update(model)
 	if err != nil {
-		msg := "Couldn't update measurement in database"
 		glog.Errorf("%s %s: %v", logPrefix, msg, err)
-		c.JSON(http.StatusInternalServerError, gin.H{"message": msg})
+		c.JSON(status, gin.H{"message": msg})
 		return
 	}
 
 	glog.Infof("%s Success: %+v", logPrefix, model)
-	c.JSON(http.StatusOK, gin.H{"measurement": model})
+	c.JSON(status, gin.H{"measurement": model})
 	return
 }
 
@@ -100,17 +88,16 @@ func (a *Api) deleteMeasurement(c *gin.Context) {
 	}
 
 	// Write to database
-	_, err = a.DB.Exec(DeleteMeasurementSQL, paramId)
-	// TODO(gary): add 404
+	manager := &MeasurementManager{DB: a.DB}
+	status, msg, err := manager.Delete(paramId)
 	if err != nil {
-		msg := "Couldn't delete measurement in database"
 		glog.Errorf("%s %s: %v", logPrefix, msg, err)
-		c.JSON(http.StatusInternalServerError, gin.H{"message": msg})
+		c.JSON(status, gin.H{"message": msg})
 		return
 	}
 
 	glog.Infof("%s Success", logPrefix)
-	c.JSON(http.StatusNoContent, nil)
+	c.JSON(status, nil)
 	return
 }
 
@@ -128,22 +115,16 @@ func (a *Api) getMeasurement(c *gin.Context) {
 	}
 
 	// Read from database
-	model := Measurement{}
-	err = a.DB.QueryRow(GetMeasurementSQL, paramId).Scan(&model.Id, &model.MeasurementTypeId, &model.Value, &model.Repetitions, &model.StartTime, &model.Duration, &model.DataSource)
-	if err == sql.ErrNoRows {
-		msg := "Couldn't find a measurement with that Id"
+	manager := &MeasurementManager{DB: a.DB}
+	model, status, msg, err := manager.Get(paramId)
+	if err != nil {
 		glog.Errorf("%s %s: %v", logPrefix, msg, err)
-		c.JSON(http.StatusNotFound, gin.H{"message": msg})
-		return
-	} else if err != nil {
-		msg := "Couldn't get measurement from database"
-		glog.Errorf("%s %s: %v", logPrefix, msg, err)
-		c.JSON(http.StatusInternalServerError, gin.H{"message": msg})
+		c.JSON(status, gin.H{"message": msg})
 		return
 	}
 
 	glog.Infof("%s Success: %+v", logPrefix, model)
-	c.JSON(http.StatusOK, gin.H{"measurement": model})
+	c.JSON(status, gin.H{"measurement": model})
 	return
 }
 
@@ -152,34 +133,15 @@ func (a *Api) listMeasurement(c *gin.Context) {
 	glog.Infof("%s fcn start", logPrefix)
 
 	// Read from database
-	rows, err := a.DB.Query(ListMeasurementSQL)
+	manager := &MeasurementManager{DB: a.DB}
+	models, status, msg, err := manager.List()
 	if err != nil {
-		msg := "Couldn't get measurements from database"
 		glog.Errorf("%s %s: %v", logPrefix, msg, err)
-		c.JSON(http.StatusInternalServerError, gin.H{"message": msg})
-		return
-	}
-	defer rows.Close()
-	models := []Measurement{}
-	for rows.Next() {
-		model := Measurement{}
-		err = rows.Scan(&model.Id, &model.MeasurementTypeId, &model.Value, &model.Repetitions, &model.StartTime, &model.Duration, &model.DataSource)
-		if err != nil {
-			msg := "Couldn't scan row from database"
-			glog.Infof("%s %s: %v", logPrefix, msg, err)
-		}
-		glog.Infof("%s %s", logPrefix, model)
-		models = append(models, model)
-	}
-	err = rows.Err()
-	if err != nil {
-		msg := "Error scanning rows from database"
-		glog.Errorf("%s %s: %v", logPrefix, msg, err)
-		c.JSON(http.StatusInternalServerError, gin.H{"message": msg})
+		c.JSON(status, gin.H{"message": msg})
 		return
 	}
 
 	glog.Infof("%s Success: %+v", logPrefix, models)
-	c.JSON(http.StatusOK, gin.H{"measurements": models})
+	c.JSON(status, gin.H{"measurements": models})
 	return
 }

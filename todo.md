@@ -1,4 +1,4 @@
-- Move Measurement model SQL to model file
+- Add parsers for fitnotes, strava, etc
 
 - Hardcoded API token for writes
 
