@@ -1,4 +1,4 @@
-package api
+package common
 
 import (
 	"github.com/satori/go.uuid"

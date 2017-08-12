@@ -2,7 +2,10 @@ package api
 
 import (
 	"database/sql"
+
 	"gopkg.in/gin-gonic/gin.v1"
+
+	"github.com/gdmen/delta/src/common"
 )
 
 var CREATE_TABLES_SQL = []string{
@@ -31,19 +34,19 @@ func (a *Api) GetRouter() *gin.Engine {
 	{
 		measurementType := v1.Group("/measurement_types")
 		{
-			measurementType.POST("/", RequestIdMiddleware(), a.createMeasurementType)
-			measurementType.POST("/:id", RequestIdMiddleware(), a.updateMeasurementType)
-			measurementType.DELETE("/:id", RequestIdMiddleware(), a.deleteMeasurementType)
-			measurementType.GET("/:id", RequestIdMiddleware(), a.getMeasurementType)
-			measurementType.GET("/", RequestIdMiddleware(), a.listMeasurementType)
+			measurementType.POST("/", common.RequestIdMiddleware(), a.createMeasurementType)
+			measurementType.POST("/:id", common.RequestIdMiddleware(), a.updateMeasurementType)
+			measurementType.DELETE("/:id", common.RequestIdMiddleware(), a.deleteMeasurementType)
+			measurementType.GET("/:id", common.RequestIdMiddleware(), a.getMeasurementType)
+			measurementType.GET("/", common.RequestIdMiddleware(), a.listMeasurementType)
 		}
 		measurement := v1.Group("/measurements")
 		{
-			measurement.POST("/", RequestIdMiddleware(), a.createMeasurement)
-			measurement.POST("/:id", RequestIdMiddleware(), a.updateMeasurement)
-			measurement.DELETE("/:id", RequestIdMiddleware(), a.deleteMeasurement)
-			measurement.GET("/:id", RequestIdMiddleware(), a.getMeasurement)
-			measurement.GET("/", RequestIdMiddleware(), a.listMeasurement)
+			measurement.POST("/", common.RequestIdMiddleware(), a.createMeasurement)
+			measurement.POST("/:id", common.RequestIdMiddleware(), a.updateMeasurement)
+			measurement.DELETE("/:id", common.RequestIdMiddleware(), a.deleteMeasurement)
+			measurement.GET("/:id", common.RequestIdMiddleware(), a.getMeasurement)
+			measurement.GET("/", common.RequestIdMiddleware(), a.listMeasurement)
 		}
 	}
 	return router

@@ -1,15 +1,17 @@
 package api
 
 import (
-	"github.com/golang/glog"
 	"net/http"
 	"strconv"
 
+	"github.com/golang/glog"
 	"gopkg.in/gin-gonic/gin.v1"
+
+	"github.com/gdmen/delta/src/common"
 )
 
 func (a *Api) createMeasurement(c *gin.Context) {
-	logPrefix := GetLogPrefix(c)
+	logPrefix := common.GetLogPrefix(c)
 	glog.Infof("%s fcn start", logPrefix)
 
 	// Parse input
@@ -38,7 +40,7 @@ func (a *Api) createMeasurement(c *gin.Context) {
 }
 
 func (a *Api) updateMeasurement(c *gin.Context) {
-	logPrefix := GetLogPrefix(c)
+	logPrefix := common.GetLogPrefix(c)
 	glog.Infof("%s fcn start", logPrefix)
 
 	// Parse input
@@ -75,7 +77,7 @@ func (a *Api) updateMeasurement(c *gin.Context) {
 }
 
 func (a *Api) deleteMeasurement(c *gin.Context) {
-	logPrefix := GetLogPrefix(c)
+	logPrefix := common.GetLogPrefix(c)
 	glog.Infof("%s fcn start", logPrefix)
 
 	// Parse input
@@ -102,7 +104,7 @@ func (a *Api) deleteMeasurement(c *gin.Context) {
 }
 
 func (a *Api) getMeasurement(c *gin.Context) {
-	logPrefix := GetLogPrefix(c)
+	logPrefix := common.GetLogPrefix(c)
 	glog.Infof("%s fcn start", logPrefix)
 
 	// Parse input
@@ -129,7 +131,7 @@ func (a *Api) getMeasurement(c *gin.Context) {
 }
 
 func (a *Api) listMeasurement(c *gin.Context) {
-	logPrefix := GetLogPrefix(c)
+	logPrefix := common.GetLogPrefix(c)
 	glog.Infof("%s fcn start", logPrefix)
 
 	// Read from database
