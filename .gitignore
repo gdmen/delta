@@ -1,24 +1,27 @@
 # Project binaries
 bin/
 
+# govendor files
+vendor/*/
+
 # Database files
-*.db
+       *.db
 
 # Binaries for programs and plugins
-*.exe
-*.dll
-*.so
-*.dylib
+       *.exe
+       *.dll
+       *.so
+       *.dylib
 
 # Test binary, build with `go test -c`
-*.test
+       *.test
 
 # Output of the go coverage tool, specifically when used with LiteIDE
-*.out
+       *.out
 
 # Project-local glide cache, RE: https://github.com/Masterminds/glide/issues/736
 .glide/
 
 # Editor cruft
-*.swo
-*.swp
+       *.swo
+       *.swp
