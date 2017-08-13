@@ -87,7 +87,6 @@ func (a *Api) importFitnotes(c *gin.Context) {
 			distance := row[5]
 			distance_units := row[6]
 
-			//date = strings.Replace(date, "-", "/", -1)
 			startDate, err := time.Parse("2006-01-02", date)
 			if err != nil {
 				msg := fmt.Sprintf("Error parsing file: %s", fileHeader.Filename)
@@ -182,25 +181,6 @@ func (a *Api) importFitnotes(c *gin.Context) {
 		}
 	}
 
-	// Write models
-
-	// Write to database
-	/*manager := &MeasurementTypeManager{DB: a.DB}
-	status, msg, err := manager.Create(model)
-	if err != nil {
-		glog.Errorf("%s %s: %v", logPrefix, msg, err)
-		c.JSON(status, gin.H{"message": msg})
-		return
-	}
-	manager := &MeasurementManager{DB: a.DB}
-	status, msg, err := manager.Create(model)
-	if err != nil {
-		glog.Errorf("%s %s: %v", logPrefix, msg, err)
-		c.JSON(status, gin.H{"message": msg})
-		return
-	}*/
-
-	//glog.Infof("%s Success: %+v", logPrefix, len(measurements))
 	c.JSON(http.StatusCreated, gin.H{})
 	return
 }
