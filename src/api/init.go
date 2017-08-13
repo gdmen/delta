@@ -3,7 +3,8 @@ package api
 import (
 	"database/sql"
 
-	"gopkg.in/gin-gonic/gin.v1"
+	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
 
 	"github.com/gdmen/delta/src/common"
 )
@@ -29,9 +30,16 @@ func NewApi(db *sql.DB) (*Api, error) {
 
 func (a *Api) GetRouter() *gin.Engine {
 	router := gin.Default()
+	// Allow all origins, methods
+	config := cors.Default()
+	router.Use(config)
 
 	v1 := router.Group("/api/v1")
 	{
+		importFiles := v1.Group("/import")
+		{
+			importFiles.POST("/fitnotes", common.RequestIdMiddleware(), a.importFitnotes)
+		}
 		measurementType := v1.Group("/measurement_types")
 		{
 			measurementType.POST("/", common.RequestIdMiddleware(), a.createMeasurementType)

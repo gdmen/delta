@@ -1,8 +1,8 @@
 package common
 
 import (
+	"github.com/gin-gonic/gin"
 	"github.com/satori/go.uuid"
-	"gopkg.in/gin-gonic/gin.v1"
 )
 
 const (

@@ -12,7 +12,8 @@ import (
 )
 
 func TestMeasurementTypeBasic(t *testing.T) {
-	r := api.GetRouter()
+	ResetTestApi()
+	r := TestApi.GetRouter()
 
 	// Create
 	resp := httptest.NewRecorder()
@@ -36,7 +37,7 @@ func TestMeasurementTypeBasic(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if strings.TrimSpace(string(body)) != "{\"measurement_type\":{\"id\":1,\"name\":\"barbell back squat\",\"units\":\"lbs\"}}" {
+	if strings.TrimSpace(string(body)) != `{"measurement_type":{"id":1,"name":"barbell back squat","units":"lbs"}}` {
 		t.Fatal(string(body))
 	}
 
@@ -55,7 +56,7 @@ func TestMeasurementTypeBasic(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if strings.TrimSpace(string(body)) != "{\"measurement_types\":[{\"id\":1,\"name\":\"barbell back squat\",\"units\":\"lbs\"}]}" {
+	if strings.TrimSpace(string(body)) != `{"measurement_types":[{"id":1,"name":"barbell back squat","units":"lbs"}]}` {
 		t.Fatal(string(body))
 	}
 
@@ -80,7 +81,7 @@ func TestMeasurementTypeBasic(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if strings.TrimSpace(string(body)) != "{\"measurement_type\":{\"id\":1,\"name\":\"deadlift\",\"units\":\"kg\"}}" {
+	if strings.TrimSpace(string(body)) != `{"measurement_type":{"id":1,"name":"deadlift","units":"kg"}}` {
 		t.Fatal(string(body))
 	}
 
@@ -99,7 +100,7 @@ func TestMeasurementTypeBasic(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if strings.TrimSpace(string(body)) != "{\"measurement_type\":{\"id\":1,\"name\":\"deadlift\",\"units\":\"kg\"}}" {
+	if strings.TrimSpace(string(body)) != `{"measurement_type":{"id":1,"name":"deadlift","units":"kg"}}` {
 		t.Fatal(string(body))
 	}
 
@@ -129,7 +130,7 @@ func TestMeasurementTypeBasic(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if strings.TrimSpace(string(body)) != "{\"measurement_types\":[]}" {
+	if strings.TrimSpace(string(body)) != `{"measurement_types":[]}` {
 		t.Fatal(string(body))
 	}
 }

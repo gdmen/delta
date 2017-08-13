@@ -11,22 +11,24 @@ const (
 	// The id lines should be 'bigint' instead of 'integer'
 	// but sqlite3 has a fucky primary key system.
 	CreateMeasurementTypeTableSQL = `
-create table measurement_types (
-	id integer primary key,
-	name varchar not null,
-	units varchar not null,
-	constraint name unique (name)
-);`
+	create table measurement_types (
+		id integer primary key,
+		name varchar not null,
+		units varchar not null,
+		constraint name unique (name)
+	);`
 	CreateMeasurementTypeSQL = `
-insert into measurement_types(name, units) values(?, ?);`
+	insert into measurement_types(name, units) values(?, ?);`
+	ExistsMeasurementTypeSQL = `
+	select id from measurement_types where name=? and units=?;`
 	UpdateMeasurementTypeSQL = `
-update measurement_types set name=?, units=? where id=?;`
+	update measurement_types set name=?, units=? where id=?;`
 	DeleteMeasurementTypeSQL = `
-delete from measurement_types where id=?;`
+	delete from measurement_types where id=?;`
 	GetMeasurementTypeSQL = `
-select * from measurement_types where id=?;`
+	select * from measurement_types where id=?;`
 	ListMeasurementTypeSQL = `
-select * from measurement_types;`
+	select * from measurement_types;`
 )
 
 type MeasurementType struct {
@@ -44,6 +46,14 @@ type MeasurementTypeManager struct {
 }
 
 func (m *MeasurementTypeManager) Create(model *MeasurementType) (int, string, error) {
+	// Check for existence
+	var id int64
+	err := m.DB.QueryRow(ExistsMeasurementTypeSQL, model.Name, model.Units).Scan(&id)
+	if err == nil {
+		model.Id = id
+		return http.StatusCreated, "", nil
+	}
+	// Doesn't exist, so try to add it
 	result, err := m.DB.Exec(CreateMeasurementTypeSQL, model.Name, model.Units)
 	if err != nil {
 		if strings.Contains(err.Error(), "UNIQUE constraint failed") {
@@ -55,7 +65,7 @@ func (m *MeasurementTypeManager) Create(model *MeasurementType) (int, string, er
 	}
 	// Get the Id that was just auto-written to the database
 	// Ignore errors (if the database doesn't support LastInsertId)
-	id, _ := result.LastInsertId()
+	id, _ = result.LastInsertId()
 	model.Id = id
 	return http.StatusCreated, "", nil
 }

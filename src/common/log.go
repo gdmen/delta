@@ -2,8 +2,8 @@ package common
 
 import (
 	"fmt"
+	"github.com/gin-gonic/gin"
 	"github.com/golang/glog"
-	"gopkg.in/gin-gonic/gin.v1"
 	"runtime"
 	"strings"
 )

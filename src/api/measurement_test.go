@@ -12,7 +12,8 @@ import (
 )
 
 func TestMeasurementBasic(t *testing.T) {
-	r := api.GetRouter()
+	ResetTestApi()
+	r := TestApi.GetRouter()
 
 	// Create
 	resp := httptest.NewRecorder()
@@ -38,7 +39,7 @@ func TestMeasurementBasic(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if strings.TrimSpace(string(body)) != "{\"measurement\":{\"id\":1,\"measurement_type_id\":1,\"value\":405,\"repetitions\":1,\"start_time\":0,\"duration\":0,\"data_source\":\"fitnotes\"}}" {
+	if strings.TrimSpace(string(body)) != `{"measurement":{"id":1,"measurement_type_id":1,"value":405,"repetitions":1,"start_time":0,"duration":0,"data_source":"fitnotes"}}` {
 		t.Fatal(string(body))
 	}
 
@@ -57,7 +58,7 @@ func TestMeasurementBasic(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if strings.TrimSpace(string(body)) != "{\"measurements\":[{\"id\":1,\"measurement_type_id\":1,\"value\":405,\"repetitions\":1,\"start_time\":0,\"duration\":0,\"data_source\":\"fitnotes\"}]}" {
+	if strings.TrimSpace(string(body)) != `{"measurements":[{"id":1,"measurement_type_id":1,"value":405,"repetitions":1,"start_time":0,"duration":0,"data_source":"fitnotes"}]}` {
 		t.Fatal(string(body))
 	}
 
@@ -82,7 +83,7 @@ func TestMeasurementBasic(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if strings.TrimSpace(string(body)) != "{\"measurement\":{\"id\":1,\"measurement_type_id\":1,\"value\":315,\"repetitions\":20,\"start_time\":0,\"duration\":0,\"data_source\":\"fitnotes\"}}" {
+	if strings.TrimSpace(string(body)) != `{"measurement":{"id":1,"measurement_type_id":1,"value":315,"repetitions":20,"start_time":0,"duration":0,"data_source":"fitnotes"}}` {
 		t.Fatal(string(body))
 	}
 
@@ -101,7 +102,7 @@ func TestMeasurementBasic(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if strings.TrimSpace(string(body)) != "{\"measurement\":{\"id\":1,\"measurement_type_id\":1,\"value\":315,\"repetitions\":20,\"start_time\":0,\"duration\":0,\"data_source\":\"fitnotes\"}}" {
+	if strings.TrimSpace(string(body)) != `{"measurement":{"id":1,"measurement_type_id":1,"value":315,"repetitions":20,"start_time":0,"duration":0,"data_source":"fitnotes"}}` {
 		t.Fatal(string(body))
 	}
 
