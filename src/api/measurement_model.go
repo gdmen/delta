@@ -45,7 +45,7 @@ type Measurement struct {
 }
 
 func (m Measurement) String() string {
-	return fmt.Sprintf("Id: %d, MeasurementTypeId: %d, Value: %d, Repetitions: %d, StartTime: %d, Duration: %d, DataSource: %s", m.Id, m.MeasurementTypeId, m.Value, m.Repetitions, m.StartTime, m.Duration, m.DataSource)
+	return fmt.Sprintf("Id: %d, MeasurementTypeId: %d, Value: %f, Repetitions: %d, StartTime: %d, Duration: %d, DataSource: %s", m.Id, m.MeasurementTypeId, m.Value, m.Repetitions, m.StartTime, m.Duration, m.DataSource)
 }
 
 type MeasurementManager struct {
@@ -55,7 +55,7 @@ type MeasurementManager struct {
 func (m *MeasurementManager) Create(model *Measurement) (int, string, error) {
 	// Check for existence
 	var id int64
-	err := m.DB.QueryRow(GetMeasurementSQL, model.MeasurementTypeId, model.Value, model.Repetitions, model.StartTime, model.Duration, model.DataSource).Scan(&id)
+	err := m.DB.QueryRow(ExistsMeasurementSQL, model.MeasurementTypeId, model.Value, model.Repetitions, model.StartTime, model.Duration, model.DataSource).Scan(&id)
 	if err == nil {
 		model.Id = id
 		return http.StatusCreated, "", nil
@@ -123,6 +123,31 @@ func (m *MeasurementManager) Get(id int64) (*Measurement, int, string, error) {
 func (m *MeasurementManager) List() (*[]Measurement, int, string, error) {
 	models := []Measurement{}
 	rows, err := m.DB.Query(ListMeasurementSQL)
+	defer rows.Close()
+	if err != nil {
+		msg := "Couldn't get measurements from database"
+		return nil, http.StatusInternalServerError, msg, err
+	}
+	for rows.Next() {
+		model := Measurement{}
+		err = rows.Scan(&model.Id, &model.MeasurementTypeId, &model.Value, &model.Repetitions, &model.StartTime, &model.Duration, &model.DataSource)
+		if err != nil {
+			msg := "Couldn't scan row from database"
+			return nil, http.StatusInternalServerError, msg, err
+		}
+		models = append(models, model)
+	}
+	err = rows.Err()
+	if err != nil {
+		msg := "Error scanning rows from database"
+		return nil, http.StatusInternalServerError, msg, err
+	}
+	return &models, http.StatusOK, "", nil
+}
+
+func (m *MeasurementManager) Custom(sql string) (*[]Measurement, int, string, error) {
+	models := []Measurement{}
+	rows, err := m.DB.Query(sql)
 	defer rows.Close()
 	if err != nil {
 		msg := "Couldn't get measurements from database"

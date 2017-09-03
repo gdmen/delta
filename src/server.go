@@ -5,11 +5,9 @@ import (
 	api "github.com/gdmen/delta/src/api"
 	_ "github.com/mattn/go-sqlite3"
 	"log"
-	"os"
 )
 
 func main() {
-	os.Remove("./real.db")
 	db, err := sql.Open("sqlite3", "./real.db")
 	if err != nil {
 		log.Fatal(err)
