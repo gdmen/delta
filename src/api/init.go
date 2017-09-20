@@ -39,6 +39,7 @@ func (a *Api) GetRouter() *gin.Engine {
 		importFiles := v1.Group("/import")
 		{
 			importFiles.POST("/fitnotes", common.RequestIdMiddleware(), a.importFitnotes)
+			importFiles.POST("/strava", common.RequestIdMiddleware(), a.importStrava)
 		}
 		measurementType := v1.Group("/measurement_types")
 		{
