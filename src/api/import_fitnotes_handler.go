@@ -16,7 +16,7 @@ import (
 	"github.com/gdmen/delta/src/common"
 )
 
-var NAME_OVERRIDE_MAP = map[string]string{
+var fitnotes_name_override_map = map[string]string{
 	"Barbell Squat":                       "Barbell Back Squat",
 	"BJJ":                                 "Brazilian Jiu-Jitsu",
 	"Deadlift":                            "Conventional Barbell Deadlift",
@@ -27,8 +27,8 @@ var NAME_OVERRIDE_MAP = map[string]string{
 	"Stationary Bike":                     "Road Cycling",
 }
 
-func GetUniformName(name string) string {
-	if val, ok := NAME_OVERRIDE_MAP[name]; ok {
+func fitnotesGetUniformName(name string) string {
+	if val, ok := fitnotes_name_override_map[name]; ok {
 		return val
 	}
 	return name
@@ -157,7 +157,7 @@ func (a *Api) importFitnotes(c *gin.Context) {
 
 			// Save models
 			mt := &MeasurementType{
-				Name:  GetUniformName(name),
+				Name:  fitnotesGetUniformName(name),
 				Units: units,
 			}
 			status, msg, err := mtManager.Create(mt)
