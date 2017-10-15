@@ -210,12 +210,7 @@ func (a *Api) getDrilldown(c *gin.Context) {
 		hcData = append(hcData, HCData{Name: x, Drilldown: x, Y: y})
 
 		// set drilldown data
-		glog.Infof("GARY: %+v", drilldownData)
-		glog.Infof("GARY-currTime: %+v", currTime)
 		if dayData, ok := drilldownData[currTime.Unix()]; ok {
-			if currTime.Unix() == 1477983600 {
-				glog.Infof("GARY-dayData: %+v", dayData)
-			}
 			hcDD := HCDrilldownData{
 				Name: x,
 				Id:   x,
@@ -223,9 +218,6 @@ func (a *Api) getDrilldown(c *gin.Context) {
 			}
 			drilldownTime := currTime
 			for drilldownTime.Before(nextTime) {
-				if currTime.Unix() == 1477983600 {
-					glog.Infof("GARY-drilldownTime.Unix(): %+v", drilldownTime.Unix())
-				}
 				y = 0
 				if val, ok := dayData[drilldownTime.Unix()]; ok {
 					y = val
