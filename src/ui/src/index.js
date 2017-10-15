@@ -33,7 +33,92 @@ class UploadView extends React.Component {
 	}
 }
 
-class GraphView extends React.Component {
+class LineGraphView extends React.Component {
+	constructor(props) {
+		super(props);
+
+		this.state = {
+			data: [],
+		};
+	}
+	componentWillMount() {
+		//{"x": [<readable time string>,...], "y": [<value>,...]}
+		Axios.get(this.props.host + this.props.url)
+			.then(res => {
+				this.setState({
+					data: res.data.data,
+				});
+				this.renderAsync();
+			});
+	}
+	componentDidMount() {
+	}
+	componentWillUnmount() {
+		this.state.chart.destroy();
+	}
+	renderAsync() {
+		// plotBands
+		var plotBands = [{
+			id: "0",
+			from: this.props.bandOne,
+			to: this.props.bandTwo,
+			color: "rgba(244, 67, 54, 0.1) ",
+		}, {
+			id: "1",
+			from: this.props.bandTwo,
+			to: this.props.bandThree,
+			color: "rgba(255, 235, 59, 0.1)",
+		}, {
+			id: "2",
+			from: this.props.bandThree,
+			to: 1000 * (this.props.bandThree - this.props.bandOne),
+			color: "rgba(76, 175, 80, 0.1)",
+		}];
+		var config = {
+			chart: {
+				type: "line",
+			},
+			legend: {
+				enabled: false,
+			},
+			series: [{
+				name: this.props.titleX,
+				data: this.state.data,
+				pointPadding: 0,
+				groupPadding: 0,
+			}],
+			title: {
+				text: this.props.title
+			},
+			tooltip: {
+				valueDecimals: 1,
+				valueSuffix: " " + this.props.unitsX
+			},
+			xAxis: {
+				showEmpty: false,
+				type: "category",
+			},
+			yAxis: {
+				min: 0,
+				plotBands: JSON.parse(JSON.stringify(plotBands)),
+				showEmpty: false,
+				title: {
+					text: this.props.titleY
+				}
+			},
+		};
+		this.setState({
+			chart: Highcharts.chart(ReactDOM.findDOMNode(this), config)
+		});
+	}
+	render() {
+		return (
+			<div className="LineGraphView" id={ this.state.id }></div>
+	       );
+	}
+}
+
+class ColumnGraphView extends React.Component {
 	constructor(props) {
 		super(props);
 
@@ -142,7 +227,7 @@ class GraphView extends React.Component {
 	}
 	render() {
 		return (
-			<div className="{ this.props.title }GraphView" id={ this.state.id }></div>
+			<div className="ColumnGraphView" id={ this.state.id }></div>
 	       );
 	}
 }
@@ -151,9 +236,20 @@ class DashboardView extends React.Component {
 	render() {
 		return (
 			<div id="dashboard">
-				<GraphView
+				<LineGraphView
 					host="http://localhost:8080"
-					url='/api/v1/data/drilldown?fields=[{"name":"Brazilian%20Jiu-Jitsu","attr":2},{"name":"Judo","attr":2},{"name":"Wrestling","attr":2},{"name":"Boxing","attr":2},{"name":"Kickboxing","attr":2},{"name":"MMA","attr":2}]&increment=3' 
+					url='/api/v1/data/maxes?fields=[{"name":"Flat Barbell Bench Press"},{"name":"Barbell Back Squat"},{"name":"Conventional Barbell Deadlift"}]&increment=3'
+					title="Max Total"
+					titleY="Max (lbs)"
+					titleX="total"
+					unitsX="lbs"
+					bandOne="0"
+					bandTwo="750"
+					bandThree="1000"
+				/>
+				<ColumnGraphView
+					host="http://localhost:8080"
+					url='/api/v1/data/drilldown?fields=[{"name":"Brazilian Jiu-Jitsu","attr":2},{"name":"Judo","attr":2},{"name":"Wrestling","attr":2},{"name":"Boxing","attr":2},{"name":"Kickboxing","attr":2},{"name":"MMA","attr":2}]&increment=3' 
 					title="training"
 					titleY="Time training"
 					titleX="training"
@@ -162,7 +258,7 @@ class DashboardView extends React.Component {
 					bandTwo="16"
 					bandThree="32"
 				/>
-				<GraphView
+				<ColumnGraphView
 					host="http://localhost:8080"
 					url='/api/v1/data/drilldown?fields=[{"name":"Road Cycling","attr":1}]&increment=3'
 					title="biking"
@@ -183,7 +279,7 @@ const Main = () => (
 	<Switch>
 	<Route exact path="/" component={UploadView} />
 	<Route path="/dashboard" component={DashboardView} />
-	<Route path="/graph/training" component={() => (<GraphView
+	<Route path="/graph/training" component={() => (<ColumnGraphView
 		host="http://localhost:8080"
 		url='/api/v1/data/drilldown?fields=[{"name":"Brazilian%20Jiu-Jitsu","attr":2},{"name":"Judo","attr":2},{"name":"Wrestling","attr":2},{"name":"Boxing","attr":2},{"name":"Kickboxing","attr":2},{"name":"MMA","attr":2}]&increment=3' 
 		title="training"
@@ -194,7 +290,7 @@ const Main = () => (
 		bandTwo="16"
 		bandThree="32"
 	/>)} />
-	<Route path="/graph/biking" component={() => (<GraphView
+	<Route path="/graph/biking" component={() => (<ColumnGraphView
 		host="http://localhost:8080"
 		url='/api/v1/data/drilldown?fields=[{"name":"Road Cycling","attr":1}]&increment=3'
 		title="biking"
