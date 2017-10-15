@@ -67,6 +67,7 @@ func (a *Api) GetRouter() *gin.Engine {
 		data := v1.Group("/data")
 		{
 			data.GET("/drilldown", common.RequestIdMiddleware(), a.getDrilldown)
+			data.GET("/maxes", common.RequestIdMiddleware(), a.getMaxes)
 		}
 	}
 	return router

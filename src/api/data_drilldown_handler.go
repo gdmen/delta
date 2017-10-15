@@ -21,7 +21,7 @@ const (
 	DURATION
 )
 
-type DataField struct {
+type DrilldownDataField struct {
 	Name string `json:"name" form:"name" binding:"required"`
 	Attr attr   `json:"attr" form:"attr" binding:"required"`
 }
@@ -35,17 +35,17 @@ const (
 	MONTH
 )
 
-type DataForm struct {
+type DrilldownDataForm struct {
 	Fields    string    `json:"fields" form:"fields" binding:"required"`
 	Increment increment `json:"fields" form:"increment" binding:"required"`
 }
 
-type HCData struct {
+type ColumnHCData struct {
 	Name      string  `json:"name"`
 	Drilldown string  `json:"drilldown"`
 	Y         float64 `json:"y"`
 }
-type HCDrilldownData struct {
+type ColumnHCDrilldownData struct {
 	Name string          `json:"name"`
 	Id   string          `json:"id"`
 	Data [][]interface{} `json:"data"`
@@ -56,9 +56,9 @@ func (a *Api) getDrilldown(c *gin.Context) {
 	glog.Infof("%s fcn start", logPrefix)
 
 	// Parse input
-	form := &DataForm{}
+	form := &DrilldownDataForm{}
 	err := c.Bind(form)
-	var dataFields []DataField
+	var dataFields []DrilldownDataField
 	if err == nil {
 		err = json.Unmarshal([]byte(form.Fields), &dataFields)
 	}
@@ -173,19 +173,19 @@ func (a *Api) getDrilldown(c *gin.Context) {
 		}
 	}
 	/*
-	   type HCData struct {
+	   type ColumnHCData struct {
 	   	Name      string  `json:"name"`
 	   	Drilldown string  `json:"drilldown"`
 	   	Y         float64 `json:"y"`
 	   }
-	   type HCDrilldownData struct {
+	   type ColumnHCDrilldownData struct {
 	   	Name string                 `json:"name"`
 	   	Id   string                 `json:"id"`
 	   	Data [][]interface{} `json:"data"`
 	   }
 	*/
-	var hcData []HCData
-	var hcDrilldownData []HCDrilldownData
+	var hcData []ColumnHCData
+	var hcDrilldownData []ColumnHCDrilldownData
 	currTime := time.Unix(minTs, 0).In(loc)
 	for currTime.Before(time.Now().In(loc)) {
 		// get y value (default to 0)
@@ -207,11 +207,11 @@ func (a *Api) getDrilldown(c *gin.Context) {
 			x = currTime.AddDate(0, 1, -1).Format("Jan 2006")
 			nextTime = currTime.AddDate(0, 1, 0)
 		}
-		hcData = append(hcData, HCData{Name: x, Drilldown: x, Y: y})
+		hcData = append(hcData, ColumnHCData{Name: x, Drilldown: x, Y: y})
 
 		// set drilldown data
 		if dayData, ok := drilldownData[currTime.Unix()]; ok {
-			hcDD := HCDrilldownData{
+			hcDD := ColumnHCDrilldownData{
 				Name: x,
 				Id:   x,
 				Data: [][]interface{}{},

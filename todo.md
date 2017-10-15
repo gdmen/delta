@@ -1,3 +1,5 @@
+- Handler test data should be in a separate file & should be auto-updated by the tests
+
 - Add "events" that contain:
   - measurements
   - images / videos / etc
