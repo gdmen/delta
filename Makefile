@@ -16,5 +16,8 @@ test: test_api
 test_api: src/api
 	$(GOTEST) ./$^
 
-run: build
-	./bin/server
+run_api: build
+	./bin/server > server.log 2>&1
+
+run_ui:
+	cd src/ui && npm start

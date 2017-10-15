@@ -74,7 +74,7 @@ func (a *Api) importStrava(c *gin.Context) {
 			startTime, _ := trk.TimeBounds()
 			m := &Measurement{
 				MeasurementTypeId: mt.Id,
-				Value:             trk.Length3D() / 1609.34, // Length3D is in meters
+				Value:             trk.Length3D() / 1609.34, // Length3D is in meters, convert it to miles
 				Repetitions:       0,
 				StartTime:         startTime.Unix(),
 				Duration:          int32(trk.Duration()),
@@ -88,25 +88,6 @@ func (a *Api) importStrava(c *gin.Context) {
 		}
 	}
 
-	// Write models
-
-	// Write to database
-	/*manager := &MeasurementTypeManager{DB: a.DB}
-	status, msg, err := manager.Create(model)
-	if err != nil {
-		glog.Errorf("%s %s: %v", logPrefix, msg, err)
-		c.JSON(status, gin.H{"message": msg})
-		return
-	}
-	manager := &MeasurementManager{DB: a.DB}
-	status, msg, err := manager.Create(model)
-	if err != nil {
-		glog.Errorf("%s %s: %v", logPrefix, msg, err)
-		c.JSON(status, gin.H{"message": msg})
-		return
-	}*/
-
-	//glog.Infof("%s Success: %+v", logPrefix, len(measurements))
 	c.JSON(http.StatusCreated, gin.H{})
 	return
 }

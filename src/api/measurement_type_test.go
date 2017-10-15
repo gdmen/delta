@@ -30,7 +30,7 @@ func TestMeasurementTypeBasic(t *testing.T) {
 	r.ServeHTTP(resp, req)
 
 	if resp.Code != http.StatusCreated {
-		t.Fatalf("Expected status code %d, got %d. . .\n%v+", http.StatusCreated, resp.Code, resp)
+		t.Fatalf("Expected status code %d, got %d. . .\n%+v", http.StatusCreated, resp.Code, resp)
 	}
 
 	body, err := ioutil.ReadAll(resp.Body)
@@ -49,7 +49,7 @@ func TestMeasurementTypeBasic(t *testing.T) {
 	r.ServeHTTP(resp, req)
 
 	if resp.Code != http.StatusOK {
-		t.Fatalf("Expected status code %d, got %d. . .\n%v+", http.StatusOK, resp.Code, resp)
+		t.Fatalf("Expected status code %d, got %d. . .\n%+v", http.StatusOK, resp.Code, resp)
 	}
 
 	body, err = ioutil.ReadAll(resp.Body)
@@ -74,7 +74,7 @@ func TestMeasurementTypeBasic(t *testing.T) {
 	r.ServeHTTP(resp, req)
 
 	if resp.Code != http.StatusOK {
-		t.Fatalf("Expected status code %d, got %d. . .\n%v+", http.StatusOK, resp.Code, resp)
+		t.Fatalf("Expected status code %d, got %d. . .\n%+v", http.StatusOK, resp.Code, resp)
 	}
 
 	body, err = ioutil.ReadAll(resp.Body)
@@ -93,7 +93,7 @@ func TestMeasurementTypeBasic(t *testing.T) {
 	r.ServeHTTP(resp, req)
 
 	if resp.Code != http.StatusOK {
-		t.Fatalf("Expected status code %d, got %d. . .\n%v+", http.StatusOK, resp.Code, resp)
+		t.Fatalf("Expected status code %d, got %d. . .\n%+v", http.StatusOK, resp.Code, resp)
 	}
 
 	body, err = ioutil.ReadAll(resp.Body)
@@ -112,7 +112,7 @@ func TestMeasurementTypeBasic(t *testing.T) {
 	r.ServeHTTP(resp, req)
 
 	if resp.Code != http.StatusNoContent {
-		t.Fatalf("Expected status code %d, got %d. . .\n%v+", http.StatusNoContent, resp.Code, resp)
+		t.Fatalf("Expected status code %d, got %d. . .\n%+v", http.StatusNoContent, resp.Code, resp)
 	}
 
 	// List
@@ -123,7 +123,7 @@ func TestMeasurementTypeBasic(t *testing.T) {
 	r.ServeHTTP(resp, req)
 
 	if resp.Code != http.StatusOK {
-		t.Fatalf("Expected status code %d, got %d. . .\n%v+", http.StatusOK, resp.Code, resp)
+		t.Fatalf("Expected status code %d, got %d. . .\n%+v", http.StatusOK, resp.Code, resp)
 	}
 
 	body, err = ioutil.ReadAll(resp.Body)

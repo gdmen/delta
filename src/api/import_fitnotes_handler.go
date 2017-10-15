@@ -25,6 +25,7 @@ var fitnotes_name_override_map = map[string]string{
 	"Overhead Press":                      "Standing Barbell Shoulder Press (OHP)",
 	"Running (Outdoor)":                   "Running",
 	"Stationary Bike":                     "Road Cycling",
+	"Cycling":                             "Road Cycling",
 }
 
 func fitnotesGetUniformName(name string) string {
@@ -46,7 +47,7 @@ func (a *Api) importFitnotes(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"message": msg})
 		return
 	}
-	glog.Infof("%s form: %v+", logPrefix, form)
+	glog.Infof("%s form: %+v", logPrefix, form)
 	fileHeaders := form.File["files"]
 
 	// Read file and buffer models
@@ -58,7 +59,7 @@ func (a *Api) importFitnotes(c *gin.Context) {
 		file, err := fileHeader.Open()
 		if err != nil {
 			msg := fmt.Sprintf("Error reading file: %s", fileHeader.Filename)
-			glog.Errorf("%s %s: %v+", logPrefix, msg, err)
+			glog.Errorf("%s %s: %+v", logPrefix, msg, err)
 		}
 		// Read as CSV
 		r := csv.NewReader(file)
@@ -71,7 +72,7 @@ func (a *Api) importFitnotes(c *gin.Context) {
 				break
 			} else if err != nil {
 				msg := fmt.Sprintf("Error reading file: %s", fileHeader.Filename)
-				glog.Errorf("%s %s: %v+", logPrefix, msg, err)
+				glog.Errorf("%s %s: %+v", logPrefix, msg, err)
 			}
 			glog.Infof("%s read row: %s", logPrefix, row)
 			if isHeaderRow {
@@ -87,11 +88,12 @@ func (a *Api) importFitnotes(c *gin.Context) {
 			distance := row[5]
 			distance_units := row[6]
 
-			//date = strings.Replace(date, "-", "/", -1)
-			startDate, err := time.Parse("2006-01-02", date)
+			// TODO: don't use hardcoded time zones. . .
+			loc, _ := time.LoadLocation("America/Los_Angeles")
+			startDate, err := time.ParseInLocation("2006-01-02", date, loc)
 			if err != nil {
 				msg := fmt.Sprintf("Error parsing file: %s", fileHeader.Filename)
-				glog.Errorf("%s %s: %v+", logPrefix, msg, err)
+				glog.Errorf("%s %s: %+v", logPrefix, msg, err)
 				continue
 			}
 			startTime := startDate.Unix()
@@ -101,7 +103,7 @@ func (a *Api) importFitnotes(c *gin.Context) {
 				repetitions, err = strconv.ParseInt(reps, 10, 16)
 				if err != nil {
 					msg := fmt.Sprintf("Error parsing file: %s", fileHeader.Filename)
-					glog.Errorf("%s %s: %v+", logPrefix, msg, err)
+					glog.Errorf("%s %s: %+v", logPrefix, msg, err)
 					continue
 				}
 			}
@@ -111,7 +113,7 @@ func (a *Api) importFitnotes(c *gin.Context) {
 				float64Distance, err = strconv.ParseFloat(distance, 64)
 				if err != nil {
 					msg := fmt.Sprintf("Error parsing file: %s", fileHeader.Filename)
-					glog.Errorf("%s %s: %v+", logPrefix, msg, err)
+					glog.Errorf("%s %s: %+v", logPrefix, msg, err)
 					continue
 				}
 			}
@@ -126,7 +128,7 @@ func (a *Api) importFitnotes(c *gin.Context) {
 					float64Weight, err = strconv.ParseFloat(weight, 64)
 					if err != nil {
 						msg := fmt.Sprintf("Error parsing file: %s", fileHeader.Filename)
-						glog.Errorf("%s %s: %v+", logPrefix, msg, err)
+						glog.Errorf("%s %s: %+v", logPrefix, msg, err)
 						continue
 					}
 				}
@@ -146,7 +148,7 @@ func (a *Api) importFitnotes(c *gin.Context) {
 					addtlTime, err = strconv.Atoi(split[i])
 					if err != nil {
 						msg := fmt.Sprintf("Error parsing file: %s", fileHeader.Filename)
-						glog.Errorf("%s %s: %v+", logPrefix, msg, err)
+						glog.Errorf("%s %s: %+v", logPrefix, msg, err)
 						continue
 					}
 				}
@@ -182,25 +184,6 @@ func (a *Api) importFitnotes(c *gin.Context) {
 		}
 	}
 
-	// Write models
-
-	// Write to database
-	/*manager := &MeasurementTypeManager{DB: a.DB}
-	status, msg, err := manager.Create(model)
-	if err != nil {
-		glog.Errorf("%s %s: %v", logPrefix, msg, err)
-		c.JSON(status, gin.H{"message": msg})
-		return
-	}
-	manager := &MeasurementManager{DB: a.DB}
-	status, msg, err := manager.Create(model)
-	if err != nil {
-		glog.Errorf("%s %s: %v", logPrefix, msg, err)
-		c.JSON(status, gin.H{"message": msg})
-		return
-	}*/
-
-	//glog.Infof("%s Success: %+v", logPrefix, len(measurements))
 	c.JSON(http.StatusCreated, gin.H{})
 	return
 }
