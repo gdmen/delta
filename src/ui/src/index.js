@@ -247,6 +247,39 @@ class DashboardView extends React.Component {
 					bandTwo="750"
 					bandThree="1000"
 				/>
+				<LineGraphView
+					host="http://localhost:8080"
+					url='/api/v1/data/maxes?fields=[{"name":"Flat Barbell Bench Press"}]&increment=3'
+					title="Max Bench"
+					titleY="Max (lbs)"
+					titleX="max bench"
+					unitsX="lbs"
+					bandOne="0"
+					bandTwo="200"
+					bandThree="315"
+				/>
+				<LineGraphView
+					host="http://localhost:8080"
+					url='/api/v1/data/maxes?fields=[{"name":"Barbell Back Squat"}]&increment=3'
+					title="Max Squat"
+					titleY="Max (lbs)"
+					titleX="max squat"
+					unitsX="lbs"
+					bandOne="0"
+					bandTwo="315"
+					bandThree="405"
+				/>
+				<LineGraphView
+					host="http://localhost:8080"
+					url='/api/v1/data/maxes?fields=[{"name":"Conventional Barbell Deadlift"}]&increment=3'
+					title="Max Deadlift"
+					titleY="Max (lbs)"
+					titleX="max deadlift"
+					unitsX="lbs"
+					bandOne="0"
+					bandTwo="315"
+					bandThree="495"
+				/>
 				<ColumnGraphView
 					host="http://localhost:8080"
 					url='/api/v1/data/drilldown?fields=[{"name":"Brazilian Jiu-Jitsu","attr":2},{"name":"Judo","attr":2},{"name":"Wrestling","attr":2},{"name":"Boxing","attr":2},{"name":"Kickboxing","attr":2},{"name":"MMA","attr":2}]&increment=3' 
