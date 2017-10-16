@@ -172,11 +172,10 @@ func (a *Api) getMaxes(c *gin.Context) {
 			if _, ok := mTypeVals[mTypeId]; !ok {
 				// if not okay, we first add a 0 max for this measurement
 				mTypeVals[mTypeId] = 0
-			}
-			// always check if the decayed max is higher than the current max
-			if decayDetails, ok := mTypeDecay[mTypeId]; ok {
-				// compare current max to the decaying stored max (for maxes we have stored)
-				mTypeVals[mTypeId] = math.Max(mTypeVals[mTypeId], getDecayedMax(decayDetails))
+				// try to use the stored decaying max
+				if decayDetails, ok := mTypeDecay[mTypeId]; ok {
+					mTypeVals[mTypeId] = math.Max(mTypeVals[mTypeId], getDecayedMax(decayDetails))
+				}
 			}
 			mTypeDecay[mTypeId] = &DecayDetails{
 				Y:    mTypeVals[mTypeId],
