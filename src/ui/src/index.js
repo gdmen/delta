@@ -88,11 +88,11 @@ class LineGraphView extends React.Component {
 				groupPadding: 0,
 			}],
 			title: {
-				text: this.props.title
+				text: this.props.title + " - " + this.state.data[this.state.data.length - 1].y + this.props.unitsY
 			},
 			tooltip: {
 				valueDecimals: 1,
-				valueSuffix: " " + this.props.unitsX
+				valueSuffix: " " + this.props.unitsY
 			},
 			xAxis: {
 				showEmpty: false,
@@ -113,7 +113,7 @@ class LineGraphView extends React.Component {
 	}
 	render() {
 		return (
-			<div className="LineGraphView" id={ this.state.id }></div>
+			<div className="graph-view line-graph-view" id={ this.state.id }></div>
 	       );
 	}
 }
@@ -206,7 +206,7 @@ class ColumnGraphView extends React.Component {
 			},
 			tooltip: {
 				valueDecimals: 1,
-				valueSuffix: " " + this.props.unitsX
+				valueSuffix: " " + this.props.unitsY
 			},
 			xAxis: {
 				showEmpty: false,
@@ -227,7 +227,7 @@ class ColumnGraphView extends React.Component {
 	}
 	render() {
 		return (
-			<div className="ColumnGraphView" id={ this.state.id }></div>
+			<div className="graph-view column-graph-view" id={ this.state.id }></div>
 	       );
 	}
 }
@@ -236,72 +236,76 @@ class DashboardView extends React.Component {
 	render() {
 		return (
 			<div id="dashboard">
-				<LineGraphView
-					host="http://localhost:8080"
-					url='/api/v1/data/maxes?fields=[{"name":"Flat Barbell Bench Press"},{"name":"Barbell Back Squat"},{"name":"Conventional Barbell Deadlift"}]&increment=3'
-					title="Max Total"
-					titleY="Max (lbs)"
-					titleX="total"
-					unitsX="lbs"
-					bandOne="0"
-					bandTwo="750"
-					bandThree="1000"
-				/>
-				<LineGraphView
-					host="http://localhost:8080"
-					url='/api/v1/data/maxes?fields=[{"name":"Flat Barbell Bench Press"}]&increment=3'
-					title="Max Bench"
-					titleY="Max (lbs)"
-					titleX="max bench"
-					unitsX="lbs"
-					bandOne="0"
-					bandTwo="200"
-					bandThree="315"
-				/>
-				<LineGraphView
-					host="http://localhost:8080"
-					url='/api/v1/data/maxes?fields=[{"name":"Barbell Back Squat"}]&increment=3'
-					title="Max Squat"
-					titleY="Max (lbs)"
-					titleX="max squat"
-					unitsX="lbs"
-					bandOne="0"
-					bandTwo="315"
-					bandThree="405"
-				/>
-				<LineGraphView
-					host="http://localhost:8080"
-					url='/api/v1/data/maxes?fields=[{"name":"Conventional Barbell Deadlift"}]&increment=3'
-					title="Max Deadlift"
-					titleY="Max (lbs)"
-					titleX="max deadlift"
-					unitsX="lbs"
-					bandOne="0"
-					bandTwo="315"
-					bandThree="495"
-				/>
-				<ColumnGraphView
-					host="http://localhost:8080"
-					url='/api/v1/data/drilldown?fields=[{"name":"Brazilian Jiu-Jitsu","attr":2},{"name":"Judo","attr":2},{"name":"Wrestling","attr":2},{"name":"Boxing","attr":2},{"name":"Kickboxing","attr":2},{"name":"MMA","attr":2}]&increment=3' 
-					title="training"
-					titleY="Time training"
-					titleX="training"
-					unitsX="hours"
-					bandOne="0"
-					bandTwo="16"
-					bandThree="32"
-				/>
-				<ColumnGraphView
-					host="http://localhost:8080"
-					url='/api/v1/data/drilldown?fields=[{"name":"Road Cycling","attr":1}]&increment=3'
-					title="biking"
-					titleY="Distance biked"
-					titleX="biking"
-					unitsX="miles"
-					bandOne="0"
-					bandTwo="144"
-					bandThree="280"
-				/>
+				<div id="powerlifting-graphs">
+					<LineGraphView
+						host="http://localhost:8080"
+						url='/api/v1/data/maxes?fields=[{"name":"Flat Barbell Bench Press"},{"name":"Barbell Back Squat"},{"name":"Conventional Barbell Deadlift"}]&increment=3'
+						title="Total"
+						titleY="Max (lbs)"
+						titleX="total"
+						unitsY="lbs"
+						bandOne="0"
+						bandTwo="750"
+						bandThree="1000"
+					/>
+					<LineGraphView
+						host="http://localhost:8080"
+						url='/api/v1/data/maxes?fields=[{"name":"Flat Barbell Bench Press"}]&increment=3'
+						title="Bench"
+						titleY="Max (lbs)"
+						titleX="max bench"
+						unitsY="lbs"
+						bandOne="0"
+						bandTwo="165"
+						bandThree="315"
+					/>
+					<LineGraphView
+						host="http://localhost:8080"
+						url='/api/v1/data/maxes?fields=[{"name":"Barbell Back Squat"}]&increment=3'
+						title="Squat"
+						titleY="Max (lbs)"
+						titleX="max squat"
+						unitsY="lbs"
+						bandOne="0"
+						bandTwo="225"
+						bandThree="405"
+					/>
+					<LineGraphView
+						host="http://localhost:8080"
+						url='/api/v1/data/maxes?fields=[{"name":"Conventional Barbell Deadlift"}]&increment=3'
+						title="Deadlift"
+						titleY="Max (lbs)"
+						titleX="max deadlift"
+						unitsY="lbs"
+						bandOne="0"
+						bandTwo="315"
+						bandThree="495"
+					/>
+				</div>
+				<div id="training-graphs">
+					<ColumnGraphView
+						host="http://localhost:8080"
+						url='/api/v1/data/drilldown?fields=[{"name":"Brazilian Jiu-Jitsu","attr":2},{"name":"Judo","attr":2},{"name":"Wrestling","attr":2},{"name":"Boxing","attr":2},{"name":"Kickboxing","attr":2},{"name":"MMA","attr":2}]&increment=3'
+						title="training"
+						titleY="Time training"
+						titleX="training"
+						unitsY="hours"
+						bandOne="0"
+						bandTwo="16"
+						bandThree="32"
+					/>
+					<ColumnGraphView
+						host="http://localhost:8080"
+						url='/api/v1/data/drilldown?fields=[{"name":"Road Cycling","attr":1}]&increment=3'
+						title="biking"
+						titleY="Distance biked"
+						titleX="biking"
+						unitsY="miles"
+						bandOne="0"
+						bandTwo="144"
+						bandThree="280"
+					/>
+				</div>
 			</div>
 		);
 	}
@@ -318,7 +322,7 @@ const Main = () => (
 		title="training"
 		titleY="Time training"
 		titleX="training"
-		unitsX="hours"
+		unitsY="hours"
 		bandOne="0"
 		bandTwo="16"
 		bandThree="32"
@@ -328,8 +332,8 @@ const Main = () => (
 		url='/api/v1/data/drilldown?fields=[{"name":"Road Cycling","attr":1}]&increment=3'
 		title="biking"
 		titleY="Distance biked"
+		unitsY="miles"
 		titleX="biking"
-		unitsX="miles"
 		bandOne="0"
 		bandTwo="144"
 		bandThree="280"

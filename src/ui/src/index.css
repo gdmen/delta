@@ -1,2 +1,12 @@
 body {
 }
+
+.graph-view {
+	height: 200px;
+}
+#powerlifting-graphs {
+	width: 30%;
+}
+#training-graphs {
+	width: 30%;
+}
