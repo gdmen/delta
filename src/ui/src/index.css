@@ -1,12 +1,40 @@
 body {
 }
 
-.graph-view {
-	height: 200px;
+.line-graph-view {
+	height: 12em;
 }
+.column-graph-view {
+	height: 12em;
+}
+.solid-gauge-view {
+	height: 18em;
+	width: 100%;
+	position: relative;
+}
+.solid-gauge-graph {
+	height: 100%;
+	margin: 0 auto;
+}
+.solid-gauge-label {
+	position: absolute;
+	width: 100%;
+	text-align: center;
+	top: 30%;
+}
+.solid-gauge-value, .solid-gauge-max {
+	font-size: 3em;
+}
+.solid-gauge-max {
+	border-top: 0.0625em solid black;
+	display: inline-block;
+}
+
 #powerlifting-graphs {
 	width: 30%;
+	float: left;
 }
 #training-graphs {
 	width: 30%;
+	float: right;
 }

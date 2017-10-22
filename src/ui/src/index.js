@@ -3,9 +3,15 @@ import ReactDOM from "react-dom";
 import { BrowserRouter, Route, Switch } from "react-router-dom";
 import Axios from "axios";
 import Highcharts from "highcharts";
-import HighchartsDrilldown from 'highcharts-drilldown';
+import HighchartsMore from "highcharts-more";
+import HighchartsDrilldown from "highcharts-drilldown";
+import HighchartsSolidGauge from "highcharts-solid-gauge";
 
 import "./index.css";
+
+HighchartsDrilldown(Highcharts);
+HighchartsMore(Highcharts);
+HighchartsSolidGauge(Highcharts);
 
 const NotFound = () =>
 	<div>
@@ -38,11 +44,11 @@ class LineGraphView extends React.Component {
 		super(props);
 
 		this.state = {
+			chart: null,
 			data: [],
 		};
 	}
 	componentWillMount() {
-		//{"x": [<readable time string>,...], "y": [<value>,...]}
 		Axios.get(this.props.host + this.props.url)
 			.then(res => {
 				this.setState({
@@ -50,8 +56,6 @@ class LineGraphView extends React.Component {
 				});
 				this.renderAsync();
 			});
-	}
-	componentDidMount() {
 	}
 	componentWillUnmount() {
 		this.state.chart.destroy();
@@ -62,7 +66,7 @@ class LineGraphView extends React.Component {
 			id: "0",
 			from: this.props.bandOne,
 			to: this.props.bandTwo,
-			color: "rgba(244, 67, 54, 0.1) ",
+			color: "rgba(244, 67, 54, 0.1)",
 		}, {
 			id: "1",
 			from: this.props.bandTwo,
@@ -78,6 +82,9 @@ class LineGraphView extends React.Component {
 			chart: {
 				type: "line",
 			},
+			credits: {
+				enabled: false,
+			},
 			legend: {
 				enabled: false,
 			},
@@ -88,7 +95,8 @@ class LineGraphView extends React.Component {
 				groupPadding: 0,
 			}],
 			title: {
-				text: this.props.title + " - " + this.state.data[this.state.data.length - 1].y + this.props.unitsY
+				// Title of the form "<title> - <most recent max><units>"
+				text: this.props.title + " - " + Math.floor(this.state.data[this.state.data.length - 1].y) + this.props.unitsY
 			},
 			tooltip: {
 				valueDecimals: 1,
@@ -113,7 +121,7 @@ class LineGraphView extends React.Component {
 	}
 	render() {
 		return (
-			<div className="graph-view line-graph-view" id={ this.state.id }></div>
+			<div className="line-graph-view"></div>
 	       );
 	}
 }
@@ -123,13 +131,12 @@ class ColumnGraphView extends React.Component {
 		super(props);
 
 		this.state = {
+			chart: null,
 			data: [],
 			drilldown: [],
 		};
 	}
 	componentWillMount() {
-		HighchartsDrilldown(Highcharts);
-		//{"x": [<readable time string>,...], "y": [<value>,...]}
 		Axios.get(this.props.host + this.props.url)
 			.then(res => {
 				this.setState({
@@ -138,8 +145,6 @@ class ColumnGraphView extends React.Component {
 				});
 				this.renderAsync();
 			});
-	}
-	componentDidMount() {
 	}
 	componentWillUnmount() {
 		this.state.chart.destroy();
@@ -158,17 +163,17 @@ class ColumnGraphView extends React.Component {
 			id: "0",
 			from: this.props.bandOne,
 			to: this.props.bandTwo,
-			color: "rgba(244, 67, 54, 0.1) ",
+			color: Highcharts.Color("#f44336").setOpacity(0.1).get(),
 		}, {
 			id: "1",
 			from: this.props.bandTwo,
 			to: this.props.bandThree,
-			color: "rgba(255, 235, 59, 0.1)",
+			color: Highcharts.Color("#ffeb3b").setOpacity(0.1).get(),
 		}, {
 			id: "2",
 			from: this.props.bandThree,
 			to: 1000 * (this.props.bandThree - this.props.bandOne),
-			color: "rgba(76, 175, 80, 0.1)",
+			color: Highcharts.Color("#4caf50").setOpacity(0.1).get(),
 		}];
 		var config = {
 			chart: {
@@ -185,6 +190,9 @@ class ColumnGraphView extends React.Component {
 						}
 					},
 				},
+			},
+			credits: {
+				enabled: false,
 			},
 			drilldown: {
 				activeAxisLabelStyle: { "color": "#666666", "cursor": "default", "fontSize": "11px", "fontWeight": "normal", "textDecoration": "none"},
@@ -227,7 +235,102 @@ class ColumnGraphView extends React.Component {
 	}
 	render() {
 		return (
-			<div className="graph-view column-graph-view" id={ this.state.id }></div>
+			<div className="column-graph-view"></div>
+	       );
+	}
+}
+
+class SolidGaugeView extends React.Component {
+	constructor(props) {
+		super(props);
+
+		this.state = {
+			chart: null,
+			value: 0,
+		};
+	}
+	componentWillMount() {
+		Axios.get(this.props.host + this.props.url)
+			.then(res => {
+				this.setState({
+					value: res.data.value,
+				});
+				this.renderAsync();
+			});
+	}
+	componentWillUnmount() {
+		this.state.chart.destroy();
+	}
+	renderAsync() {
+		var backgroundColor = "#f44336";
+		var percentageComplete = this.state.value * 1.0 / this.props.maxY;
+		if (percentageComplete>= 0.75) {
+			backgroundColor = "#4caf50";
+		} else if (percentageComplete >= 0.25) {
+			backgroundColor = "#ffeb3b";
+		}
+		var config = {
+			chart: {
+				type: "solidgauge",
+			},
+			credits: {
+				enabled: false,
+			},
+			pane: {
+				background: [{
+					backgroundColor: Highcharts.Color(backgroundColor).setOpacity(0.3).get(),
+					borderWidth: 0,
+					innerRadius: "85%",
+					outerRadius: "100%",
+				}],
+				endAngle: 360,
+				startAngle: 0,
+			},
+			plotOptions: {
+				solidgauge: {
+					dataLabels: {
+						enabled: false
+					},
+					rounded: false,
+					stickyTracking: false,
+				}
+			},
+			series: [{
+				name: this.props.title,
+				data: [{
+					color: backgroundColor,
+					innerRadius: "85%",
+					radius: "100%",
+					y: this.state.value
+				}]
+			}],
+			title: {
+				text: null
+			},
+			tooltip: {
+				enabled: false
+			},
+			yAxis: {
+				min: 0,
+				max: parseInt(this.props.maxY, 10),
+				lineWidth: 0,
+				tickPositions: []
+			},
+		};
+		this.setState({
+			chart: Highcharts.chart(ReactDOM.findDOMNode(this).children[0], config)
+		});
+	}
+	render() {
+		return (
+			<div className="solid-gauge-view">
+				<div className="solid-gauge-graph"></div>
+				<div className="solid-gauge-label">
+					<div className="solid-gauge-title">{this.props.title} ({this.props.units})</div>
+					<div className="solid-gauge-value">{this.state.value}</div>
+					<div className="solid-gauge-max">{this.props.maxY}</div>
+				</div>
+			</div>
 	       );
 	}
 }
@@ -237,11 +340,17 @@ class DashboardView extends React.Component {
 		return (
 			<div id="dashboard">
 				<div id="powerlifting-graphs">
+					<SolidGaugeView
+						host="http://localhost:8080"
+						url='/api/v1/data/maxes?fields=[{"name":"Flat Barbell Bench Press"},{"name":"Barbell Back Squat"},{"name":"Conventional Barbell Deadlift"}]&increment=3&maxOnly=1'
+						title="Powerlifting Total"
+						units="lbs"
+						maxY="1000"
+					/>
 					<LineGraphView
 						host="http://localhost:8080"
 						url='/api/v1/data/maxes?fields=[{"name":"Flat Barbell Bench Press"},{"name":"Barbell Back Squat"},{"name":"Conventional Barbell Deadlift"}]&increment=3'
 						title="Total"
-						titleY="Max (lbs)"
 						titleX="total"
 						unitsY="lbs"
 						bandOne="0"
@@ -252,7 +361,6 @@ class DashboardView extends React.Component {
 						host="http://localhost:8080"
 						url='/api/v1/data/maxes?fields=[{"name":"Flat Barbell Bench Press"}]&increment=3'
 						title="Bench"
-						titleY="Max (lbs)"
 						titleX="max bench"
 						unitsY="lbs"
 						bandOne="0"
@@ -263,7 +371,6 @@ class DashboardView extends React.Component {
 						host="http://localhost:8080"
 						url='/api/v1/data/maxes?fields=[{"name":"Barbell Back Squat"}]&increment=3'
 						title="Squat"
-						titleY="Max (lbs)"
 						titleX="max squat"
 						unitsY="lbs"
 						bandOne="0"
@@ -274,7 +381,6 @@ class DashboardView extends React.Component {
 						host="http://localhost:8080"
 						url='/api/v1/data/maxes?fields=[{"name":"Conventional Barbell Deadlift"}]&increment=3'
 						title="Deadlift"
-						titleY="Max (lbs)"
 						titleX="max deadlift"
 						unitsY="lbs"
 						bandOne="0"
@@ -283,12 +389,18 @@ class DashboardView extends React.Component {
 					/>
 				</div>
 				<div id="training-graphs">
+					<SolidGaugeView
+						host="http://localhost:8080"
+						url='/api/v1/data/drilldown?fields=[{"name":"Brazilian Jiu-Jitsu","attr":2},{"name":"Judo","attr":2},{"name":"Wrestling","attr":2}]&increment=3&maxOnly=1'
+						title="Mat Time"
+						units="hrs"
+						maxY="35"
+					/>
 					<ColumnGraphView
 						host="http://localhost:8080"
-						url='/api/v1/data/drilldown?fields=[{"name":"Brazilian Jiu-Jitsu","attr":2},{"name":"Judo","attr":2},{"name":"Wrestling","attr":2},{"name":"Boxing","attr":2},{"name":"Kickboxing","attr":2},{"name":"MMA","attr":2}]&increment=3'
-						title="training"
-						titleY="Time training"
-						titleX="training"
+						url='/api/v1/data/drilldown?fields=[{"name":"Brazilian Jiu-Jitsu","attr":2},{"name":"Judo","attr":2},{"name":"Wrestling","attr":2}]&increment=3'
+						title="Grappling"
+						titleX="hours grappling"
 						unitsY="hours"
 						bandOne="0"
 						bandTwo="16"
@@ -297,9 +409,8 @@ class DashboardView extends React.Component {
 					<ColumnGraphView
 						host="http://localhost:8080"
 						url='/api/v1/data/drilldown?fields=[{"name":"Road Cycling","attr":1}]&increment=3'
-						title="biking"
-						titleY="Distance biked"
-						titleX="biking"
+						title="Biking"
+						titleX="miles biked"
 						unitsY="miles"
 						bandOne="0"
 						bandTwo="144"
@@ -316,28 +427,6 @@ const Main = () => (
 	<Switch>
 	<Route exact path="/" component={UploadView} />
 	<Route path="/dashboard" component={DashboardView} />
-	<Route path="/graph/training" component={() => (<ColumnGraphView
-		host="http://localhost:8080"
-		url='/api/v1/data/drilldown?fields=[{"name":"Brazilian%20Jiu-Jitsu","attr":2},{"name":"Judo","attr":2},{"name":"Wrestling","attr":2},{"name":"Boxing","attr":2},{"name":"Kickboxing","attr":2},{"name":"MMA","attr":2}]&increment=3' 
-		title="training"
-		titleY="Time training"
-		titleX="training"
-		unitsY="hours"
-		bandOne="0"
-		bandTwo="16"
-		bandThree="32"
-	/>)} />
-	<Route path="/graph/biking" component={() => (<ColumnGraphView
-		host="http://localhost:8080"
-		url='/api/v1/data/drilldown?fields=[{"name":"Road Cycling","attr":1}]&increment=3'
-		title="biking"
-		titleY="Distance biked"
-		unitsY="miles"
-		titleX="biking"
-		bandOne="0"
-		bandTwo="144"
-		bandThree="280"
-	/>)} />
 	<Route path="*" component={NotFound} />
 	</Switch>
 	</main>

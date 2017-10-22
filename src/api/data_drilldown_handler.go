@@ -120,7 +120,7 @@ func (a *Api) getDrilldown(c *gin.Context) {
 		c.JSON(status, gin.H{"message": msg})
 		return
 	}
-	glog.Infof("%s Measurements: %+v", logPrefix, measurements)
+	glog.Infof("%s %d measurements", logPrefix, len(*measurements))
 
 	// Generate output x values (with 0 values, a.k.a. not sparse)
 	data := map[int64]float64{}
@@ -204,7 +204,7 @@ func (a *Api) getDrilldown(c *gin.Context) {
 			x = currTime.AddDate(0, 0, 6).Format("2006-01-02")
 			nextTime = currTime.AddDate(0, 0, 7)
 		case MONTH:
-			x = currTime.AddDate(0, 1, -1).Format("Jan 2006")
+			x = currTime.AddDate(0, 1, -1).Format("Jan '06")
 			nextTime = currTime.AddDate(0, 1, 0)
 		}
 		hcData = append(hcData, ColumnHCData{Name: x, Drilldown: x, Y: y})

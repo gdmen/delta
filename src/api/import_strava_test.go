@@ -67,7 +67,7 @@ func TestImportStravaBasic(t *testing.T) {
 		t.Fatal(err)
 	}
 	if strings.TrimSpace(string(body)) != `{"measurement_types":[{"id":1,"name":"Road Cycling","units":"mi"}]}` {
-		t.Fatal(string(body))
+		t.Fatal("ERROR: " + string(body))
 	}
 
 	// Verify Measurements
@@ -86,6 +86,6 @@ func TestImportStravaBasic(t *testing.T) {
 		t.Fatal(err)
 	}
 	if strings.TrimSpace(string(body)) != `{"measurements":[{"id":1,"measurement_type_id":1,"value":6.1154513702093265,"repetitions":0,"start_time":1496243985,"duration":1886,"data_source":"strava"}]}` {
-		t.Fatal(string(body))
+		t.Fatal("ERROR: " + string(body))
 	}
 }
