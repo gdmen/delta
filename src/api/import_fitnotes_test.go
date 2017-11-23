@@ -67,7 +67,7 @@ func TestImportFitnotesBasic(t *testing.T) {
 		t.Fatal(err)
 	}
 	if strings.TrimSpace(string(body)) != `{"measurement_types":[{"id":1,"name":"Brazilian Jiu-Jitsu","units":""},{"id":2,"name":"Gymnastics","units":""},{"id":3,"name":"Road Cycling","units":"mi"},{"id":4,"name":"Barbell Back Squat","units":"lbs"},{"id":5,"name":"Pull Up","units":"lbs"}]}` {
-		t.Fatal(string(body))
+		t.Fatal("ERROR: " + string(body))
 	}
 
 	// Verify Measurements
@@ -86,6 +86,6 @@ func TestImportFitnotesBasic(t *testing.T) {
 		t.Fatal(err)
 	}
 	if strings.TrimSpace(string(body)) != `{"measurements":[{"id":1,"measurement_type_id":1,"value":0,"repetitions":0,"start_time":1479369600,"duration":9000,"data_source":"fitnotes"},{"id":2,"measurement_type_id":2,"value":0,"repetitions":0,"start_time":1481011200,"duration":4800,"data_source":"fitnotes"},{"id":3,"measurement_type_id":3,"value":3.3,"repetitions":0,"start_time":1481097600,"duration":0,"data_source":"fitnotes"},{"id":4,"measurement_type_id":4,"value":95,"repetitions":10,"start_time":1484553600,"duration":0,"data_source":"fitnotes"},{"id":5,"measurement_type_id":4,"value":145,"repetitions":5,"start_time":1484553600,"duration":0,"data_source":"fitnotes"},{"id":6,"measurement_type_id":5,"value":0,"repetitions":7,"start_time":1484553600,"duration":0,"data_source":"fitnotes"},{"id":7,"measurement_type_id":5,"value":0,"repetitions":3,"start_time":1484553600,"duration":0,"data_source":"fitnotes"}]}` {
-		t.Fatal(string(body))
+		t.Fatal("ERROR: " + string(body))
 	}
 }

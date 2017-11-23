@@ -40,7 +40,7 @@ func TestMeasurementBasic(t *testing.T) {
 		t.Fatal(err)
 	}
 	if strings.TrimSpace(string(body)) != `{"measurement":{"id":1,"measurement_type_id":1,"value":405,"repetitions":1,"start_time":0,"duration":0,"data_source":"fitnotes"}}` {
-		t.Fatal(string(body))
+		t.Fatal("ERROR: " + string(body))
 	}
 
 	// List
@@ -59,7 +59,7 @@ func TestMeasurementBasic(t *testing.T) {
 		t.Fatal(err)
 	}
 	if strings.TrimSpace(string(body)) != `{"measurements":[{"id":1,"measurement_type_id":1,"value":405,"repetitions":1,"start_time":0,"duration":0,"data_source":"fitnotes"}]}` {
-		t.Fatal(string(body))
+		t.Fatal("ERROR: " + string(body))
 	}
 
 	// Update
@@ -84,7 +84,7 @@ func TestMeasurementBasic(t *testing.T) {
 		t.Fatal(err)
 	}
 	if strings.TrimSpace(string(body)) != `{"measurement":{"id":1,"measurement_type_id":1,"value":315,"repetitions":20,"start_time":0,"duration":0,"data_source":"fitnotes"}}` {
-		t.Fatal(string(body))
+		t.Fatal("ERROR: " + string(body))
 	}
 
 	// Get
@@ -103,7 +103,7 @@ func TestMeasurementBasic(t *testing.T) {
 		t.Fatal(err)
 	}
 	if strings.TrimSpace(string(body)) != `{"measurement":{"id":1,"measurement_type_id":1,"value":315,"repetitions":20,"start_time":0,"duration":0,"data_source":"fitnotes"}}` {
-		t.Fatal(string(body))
+		t.Fatal("ERROR: " + string(body))
 	}
 
 	// Delete
@@ -133,6 +133,6 @@ func TestMeasurementBasic(t *testing.T) {
 		t.Fatal(err)
 	}
 	if strings.TrimSpace(string(body)) != "{\"measurements\":[]}" {
-		t.Fatal(string(body))
+		t.Fatal("ERROR: " + string(body))
 	}
 }

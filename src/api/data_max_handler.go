@@ -20,7 +20,8 @@ type MaxesDataField struct {
 
 type MaxesDataForm struct {
 	Fields    string    `json:"fields" form:"fields" binding:"required"`
-	Increment increment `json:"fields" form:"increment" binding:"required"`
+	MaxOnly   bool      `json:"maxOnly" form:"maxOnly"`
+	Increment increment `json:"increment" form:"increment" binding:"required"`
 }
 
 type MaxesHCData struct {
@@ -33,7 +34,7 @@ type DecayDetails struct {
 	Days int64 // # of days that have passed since this max
 }
 
-const MaxDecayDays = 300.0
+const MaxDecayDays = 365
 
 func getDecayedMax(m *DecayDetails) float64 {
 	decayed := m.Y * math.Log(math.Max(1, float64(MaxDecayDays-m.Days))) / math.Log(MaxDecayDays)
@@ -101,7 +102,7 @@ func (a *Api) getMaxes(c *gin.Context) {
 		c.JSON(status, gin.H{"message": msg})
 		return
 	}
-	glog.Infof("%s Measurements: %+v", logPrefix, measurements)
+	glog.Infof("%s %d measurements", logPrefix, len(*measurements))
 
 	// Generate output x values (with 0 values, a.k.a. not sparse)
 	// First level of the map is <x> (timestamp)
@@ -143,6 +144,7 @@ func (a *Api) getMaxes(c *gin.Context) {
 			data[newTs][m.MeasurementTypeId] = 0
 			currTs = newTs
 		}
+		// Potential new max for currTs
 		computedMax := m.Value
 		if m.Repetitions > 1 {
 			computedMax = math.Floor(m.Value * (1 + (float64(m.Repetitions) / 30)))
@@ -198,7 +200,7 @@ func (a *Api) getMaxes(c *gin.Context) {
 			nextTime = currTime.AddDate(0, 0, 7)
 			decayDaysIncr = 7
 		case MONTH:
-			x = currTime.AddDate(0, 1, -1).Format("Jan 2006")
+			x = currTime.AddDate(0, 1, -1).Format("Jan '06")
 			nextTime = currTime.AddDate(0, 1, 0)
 			decayDaysIncr = int64(nextTime.Sub(currTime).Hours() / 24)
 		}
@@ -213,6 +215,10 @@ func (a *Api) getMaxes(c *gin.Context) {
 		}
 	}
 
-	c.JSON(http.StatusOK, gin.H{"data": hcData})
+	if form.MaxOnly {
+		c.JSON(http.StatusOK, gin.H{"value": hcData[len(hcData)-1].Y})
+	} else {
+		c.JSON(http.StatusOK, gin.H{"data": hcData})
+	}
 	return
 }

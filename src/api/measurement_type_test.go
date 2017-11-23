@@ -38,7 +38,7 @@ func TestMeasurementTypeBasic(t *testing.T) {
 		t.Fatal(err)
 	}
 	if strings.TrimSpace(string(body)) != `{"measurement_type":{"id":1,"name":"barbell back squat","units":"lbs"}}` {
-		t.Fatal(string(body))
+		t.Fatal("ERROR: " + string(body))
 	}
 
 	// List
@@ -57,7 +57,7 @@ func TestMeasurementTypeBasic(t *testing.T) {
 		t.Fatal(err)
 	}
 	if strings.TrimSpace(string(body)) != `{"measurement_types":[{"id":1,"name":"barbell back squat","units":"lbs"}]}` {
-		t.Fatal(string(body))
+		t.Fatal("ERROR: " + string(body))
 	}
 
 	// Update
@@ -82,7 +82,7 @@ func TestMeasurementTypeBasic(t *testing.T) {
 		t.Fatal(err)
 	}
 	if strings.TrimSpace(string(body)) != `{"measurement_type":{"id":1,"name":"deadlift","units":"kg"}}` {
-		t.Fatal(string(body))
+		t.Fatal("ERROR: " + string(body))
 	}
 
 	// Get
@@ -101,7 +101,7 @@ func TestMeasurementTypeBasic(t *testing.T) {
 		t.Fatal(err)
 	}
 	if strings.TrimSpace(string(body)) != `{"measurement_type":{"id":1,"name":"deadlift","units":"kg"}}` {
-		t.Fatal(string(body))
+		t.Fatal("ERROR: " + string(body))
 	}
 
 	// Delete
@@ -131,6 +131,6 @@ func TestMeasurementTypeBasic(t *testing.T) {
 		t.Fatal(err)
 	}
 	if strings.TrimSpace(string(body)) != `{"measurement_types":[]}` {
-		t.Fatal(string(body))
+		t.Fatal("ERROR: " + string(body))
 	}
 }
