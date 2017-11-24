@@ -45,6 +45,12 @@
 			"versionExact": "v1.2"
 		},
 		{
+			"checksumSHA1": "rAnxK4LbUVYQh6VwXkq/89JaroY=",
+			"path": "github.com/go-sql-driver/mysql",
+			"revision": "cd4cb909ce1a31435164be29bf3682031f61539a",
+			"revisionTime": "2017-11-17T11:51:24Z"
+		},
+		{
 			"checksumSHA1": "HmbftipkadrLlCfzzVQ+iFHbl6g=",
 			"path": "github.com/golang/glog",
 			"revision": "23def4e6c14b4da8ac2ed8007337bc5eb5007998",
@@ -67,12 +73,6 @@
 			"path": "github.com/mattn/go-isatty",
 			"revision": "fc9e8d8ef48496124e79ae0df75490096eccf6fe",
 			"revisionTime": "2017-03-22T23:44:13Z"
-		},
-		{
-			"checksumSHA1": "bkkGN70qZCy8YaN89dqB1fONZJU=",
-			"path": "github.com/mattn/go-sqlite3",
-			"revision": "83772a7051f5e30d8e59746a9e43dfa706b72f3b",
-			"revisionTime": "2017-05-29T14:59:28Z"
 		},
 		{
 			"checksumSHA1": "eODZgOMbqZqbU3QxJZ4aj8Ok75M=",

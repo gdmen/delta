@@ -2,13 +2,20 @@ package main
 
 import (
 	"database/sql"
-	api "github.com/gdmen/delta/src/api"
-	_ "github.com/mattn/go-sqlite3"
+	"fmt"
+	"github.com/gdmen/delta/src/api"
+	"github.com/gdmen/delta/src/common"
+	_ "github.com/go-sql-driver/mysql"
 	"log"
 )
 
 func main() {
-	db, err := sql.Open("sqlite3", "./real.db")
+	c, err := common.ReadConfig("conf.json")
+	if err != nil {
+		log.Fatal(err)
+	}
+	connectStr := fmt.Sprintf("%s:%s@/%s?charset=utf8", c.MySQLUser, c.MySQLPass, c.MySQLDatabase)
+	db, err := sql.Open("mysql", connectStr)
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -11,24 +11,23 @@ const (
 	// The id lines should be 'bigint' instead of 'integer'
 	// but sqlite3 has a fucky primary key system.
 	CreateMeasurementTypeTableSQL = `
-	create table measurement_types (
-		id integer primary key,
-		name varchar not null,
-		units varchar not null,
-		constraint name unique (name)
+	CREATE TABLE measurement_types (
+		id INT AUTO_INCREMENT PRIMARY KEY,
+		name VARCHAR(64) NOT NULL UNIQUE,
+		units VARCHAR(32) NOT NULL
 	);`
 	CreateMeasurementTypeSQL = `
-	insert into measurement_types(name, units) values(?, ?);`
+	INSERT INTO measurement_types(name, units) VALUES(?, ?);`
 	ExistsMeasurementTypeSQL = `
-	select id from measurement_types where name=? and units=?;`
+	SELECT id FROM measurement_types WHERE name=? AND units=?;`
 	UpdateMeasurementTypeSQL = `
-	update measurement_types set name=?, units=? where id=?;`
+	UPDATE measurement_types SET name=?, units=? WHERE id=?;`
 	DeleteMeasurementTypeSQL = `
-	delete from measurement_types where id=?;`
+	delete FROM measurement_types WHERE id=?;`
 	GetMeasurementTypeSQL = `
-	select * from measurement_types where id=?;`
+	SELECT * FROM measurement_types WHERE id=?;`
 	ListMeasurementTypeSQL = `
-	select * from measurement_types;`
+	SELECT * FROM measurement_types;`
 )
 
 type MeasurementType struct {

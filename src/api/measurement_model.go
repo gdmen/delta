@@ -11,27 +11,28 @@ const (
 	// The id lines should be 'bigint' instead of 'integer'
 	// but sqlite3 has a fucky primary key system.
 	CreateMeasurementTableSQL = `
-	create table measurements (
-		id integer primary key,
-		measurement_type_id integer not null,
-		value double not null,
-		repetitions smallint not null,
-		start_time bigint not null,
-		duration int not null,
-		data_source varchar not null
+	CREATE TABLE measurements (
+		id INT AUTO_INCREMENT PRIMARY KEY,
+		measurement_type_id INT NOT NULL,
+		value DOUBLE NOT NULL,
+		repetitions SMALLINT NOT NULL,
+		start_time BIGINT NOT NULL,
+		duration INT NOT NULL,
+		data_source VARCHAR(64) NOT NULL,
+		FOREIGN KEY(measurement_type_id) REFERENCES measurement_types(id)
 	);`
 	CreateMeasurementSQL = `
-	insert into measurements(measurement_type_id, value, repetitions, start_time, duration, data_source) values(?, ?, ?, ?, ?, ?);`
+	INSERT INTO measurements(measurement_type_id, value, repetitions, start_time, duration, data_source) VALUES(?, ?, ?, ?, ?, ?);`
 	ExistsMeasurementSQL = `
-	select id from measurements where measurement_type_id=? and value=? and repetitions=? and start_time=? and duration=? and data_source=?;`
+	SELECT id FROM measurements WHERE measurement_type_id=? AND value=? AND repetitions=? AND start_time=? AND duration=? AND data_source=?;`
 	UpdateMeasurementSQL = `
-	update measurements set measurement_type_id=?, value=?, repetitions=?, start_time=?, duration=?, data_source=? where id=?;`
+	UPDATE measurements SET measurement_type_id=?, value=?, repetitions=?, start_time=?, duration=?, data_source=? WHERE id=?;`
 	DeleteMeasurementSQL = `
-	delete from measurements where id=?;`
+	DELETE FROM measurements WHERE id=?;`
 	GetMeasurementSQL = `
-	select * from measurements where id=?;`
+	SELECT * FROM measurements WHERE id=?;`
 	ListMeasurementSQL = `
-	select * from measurements;`
+	SELECT * FROM measurements;`
 )
 
 type Measurement struct {
