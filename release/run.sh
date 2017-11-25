@@ -1,3 +1,4 @@
 #!/bin/bash
 set -e
-./api_server_pi && serve -s ui_server
+serve -s ui_server &
+./api_server_pi > api_server.log 2>&1
