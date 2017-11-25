@@ -340,13 +340,6 @@ class DashboardView extends React.Component {
 		return (
 			<div id="dashboard">
 				<div id="powerlifting-graphs">
-					<SolidGaugeView
-						host="http://localhost:8080"
-						url='/api/v1/data/maxes?fields=[{"name":"Flat Barbell Bench Press"},{"name":"Barbell Back Squat"},{"name":"Conventional Barbell Deadlift"}]&increment=3&maxOnly=1'
-						title="Powerlifting Total"
-						units="lbs"
-						maxY="1000"
-					/>
 					<LineGraphView
 						host="http://localhost:8080"
 						url='/api/v1/data/maxes?fields=[{"name":"Flat Barbell Bench Press"},{"name":"Barbell Back Squat"},{"name":"Conventional Barbell Deadlift"}]&increment=3'
@@ -388,7 +381,14 @@ class DashboardView extends React.Component {
 						bandThree="495"
 					/>
 				</div>
-				<div id="training-graphs">
+				<div id="gauges">
+					<SolidGaugeView
+						host="http://localhost:8080"
+						url='/api/v1/data/maxes?fields=[{"name":"Flat Barbell Bench Press"},{"name":"Barbell Back Squat"},{"name":"Conventional Barbell Deadlift"}]&increment=3&maxOnly=1'
+						title="Powerlifting Total"
+						units="lbs"
+						maxY="1000"
+					/>
 					<SolidGaugeView
 						host="http://localhost:8080"
 						url='/api/v1/data/drilldown?fields=[{"name":"Brazilian Jiu-Jitsu","attr":2},{"name":"Judo","attr":2},{"name":"Wrestling","attr":2}]&increment=3&maxOnly=1'
@@ -396,6 +396,8 @@ class DashboardView extends React.Component {
 						units="hrs"
 						maxY="35"
 					/>
+				</div>
+				<div id="training-graphs">
 					<ColumnGraphView
 						host="http://localhost:8080"
 						url='/api/v1/data/drilldown?fields=[{"name":"Brazilian Jiu-Jitsu","attr":2},{"name":"Judo","attr":2},{"name":"Wrestling","attr":2}]&increment=3'
