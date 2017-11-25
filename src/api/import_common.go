@@ -67,7 +67,7 @@ func (a *Api) importMeasurements(c *gin.Context, parseFcn ParseImportFile, dataS
 
 	// Delete all entries from the database that are from this source & during the time range covered by the current import
 	// This avoids duplicating measurements
-	glog.Infof("Clearing time range (%d - %d) for %s from database", importStart, importEnd, dataSource)
+	glog.Infof("%s Clearing time range (%d - %d) for %s from database", logPrefix, importStart, importEnd, dataSource)
 	status, msg, err := mManager.DeleteTimeRangeForSource(importStart, importEnd, dataSource)
 	if err != nil {
 		glog.Errorf("%s %s: %v", logPrefix, msg, err)

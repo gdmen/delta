@@ -29,6 +29,11 @@ class UploadView extends React.Component {
 					<input type="file" name="files" multiple />
 					<input type="submit" value="Submit" />
 					</form>
+					<h1>fitocracy</h1>
+					<form action="http://localhost:8080/api/v1/import/fitocracy" method="post" encType="multipart/form-data">
+					<input type="file" name="files" multiple />
+					<input type="submit" value="Submit" />
+					</form>
 					<h1>strava</h1>
 					<form action="http://localhost:8080/api/v1/import/strava" method="post" encType="multipart/form-data">
 					<input type="file" name="files" multiple />
