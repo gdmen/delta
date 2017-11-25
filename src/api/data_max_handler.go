@@ -95,7 +95,7 @@ func (a *Api) getMaxes(c *gin.Context) {
 		}
 	}
 	mManager := &MeasurementManager{DB: a.DB}
-	sql := "select * from measurements where measurement_type_id in (" + strings.Join(measurementTypeIds, ",") + ") order by start_time ASC;"
+	sql := "SELECT * FROM measurements WHERE measurement_type_id IN (" + strings.Join(measurementTypeIds, ",") + ") ORDER BY start_time ASC;"
 	measurements, status, msg, err := mManager.Custom(sql)
 	if err != nil {
 		glog.Errorf("%s %s: %v", logPrefix, msg, err)

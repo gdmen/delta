@@ -1,7 +1,8 @@
 package api
 
 import (
-	_ "github.com/mattn/go-sqlite3"
+	"github.com/gdmen/delta/src/common"
+	_ "github.com/go-sql-driver/mysql"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -12,7 +13,12 @@ import (
 )
 
 func TestMeasurementBasic(t *testing.T) {
-	ResetTestApi()
+	c, err := common.ReadConfig("../../test_conf.json")
+	if err != nil {
+		t.Fatalf("Couldn't read config: %v", err)
+	}
+	ResetTestApi(c)
+	InsertTestMeasurementTypes(c)
 	r := TestApi.GetRouter()
 
 	// Create
