@@ -53,6 +53,12 @@ func (a *Api) importFitnotes(c *gin.Context) {
 	// Read file and buffer models
 	mtManager := &MeasurementTypeManager{DB: a.DB}
 	mManager := &MeasurementManager{DB: a.DB}
+	// Buffer measurements to make a single write to the db at the end
+	measurements := []*Measurement{}
+	// Store measurement type name:id we've already created so we don't need to make db requests to check for pre-existence
+	measurementTypesCreated := map[string]int64{}
+	// The start and end times of the full range of measurements being imported in this call
+	var importStart, importEnd int64
 	unitsRegex := regexp.MustCompile(`[^()]+\((?P<Units>.*)\)`)
 	for _, fileHeader := range fileHeaders {
 		glog.Infof("%s parsing file: %s", logPrefix, fileHeader.Filename)
@@ -137,9 +143,7 @@ func (a *Api) importFitnotes(c *gin.Context) {
 			}
 
 			// Convert '1:00:00', '1:00', or '' to seconds
-			glog.Errorf("%s %s: %v", logPrefix, "time", row[7])
 			split := strings.Split(row[7], ":")
-			glog.Errorf("%s %s: %v", logPrefix, "split", split)
 			duration := 0
 			multiplier := 1
 			for i := len(split) - 1; i >= 0; i-- {
@@ -154,7 +158,6 @@ func (a *Api) importFitnotes(c *gin.Context) {
 				}
 				duration += addtlTime * multiplier
 				multiplier *= 60
-				glog.Errorf("%s %s: %v", logPrefix, "duration", duration)
 			}
 
 			// Save models
@@ -162,11 +165,15 @@ func (a *Api) importFitnotes(c *gin.Context) {
 				Name:  fitnotesGetUniformName(name),
 				Units: units,
 			}
-			status, msg, err := mtManager.Create(mt)
-			// TODO: create fcn should check for exact existence and return 201 if so. 400 error indicates that the Unique constraint was violated. If so, still add the Measurement.
-			if err != nil && status != http.StatusBadRequest {
-				glog.Errorf("%s %s: %v", logPrefix, msg, err)
-				continue
+			if mtId, ok := measurementTypesCreated[mt.Name]; ok {
+				mt.Id = mtId
+			} else {
+				status, msg, err := mtManager.Create(mt)
+				// TODO: create fcn should check for exact existence and return 201 if so. 400 error indicates that the Unique constraint was violated. If so, still add the Measurement.
+				if err != nil && status != http.StatusBadRequest {
+					glog.Errorf("%s %s: %v", logPrefix, msg, err)
+				}
+				measurementTypesCreated[mt.Name] = mt.Id
 			}
 			m := &Measurement{
 				MeasurementTypeId: mt.Id,
@@ -176,14 +183,31 @@ func (a *Api) importFitnotes(c *gin.Context) {
 				Duration:          int32(duration),
 				DataSource:        "fitnotes",
 			}
-			status, msg, err = mManager.Create(m)
-			if err != nil {
-				glog.Errorf("%s %s: %v", logPrefix, msg, err)
-				continue
+			measurements = append(measurements, m)
+			// Update the total time range
+			if importStart == 0 || startTime < importStart {
+				importStart = startTime
+			}
+			if startTime > importEnd {
+				importEnd = startTime
 			}
 		}
 	}
 
-	c.JSON(http.StatusCreated, gin.H{})
+	// Delete all entries from the database that are from this source & during the time range covered by the current import
+	// This avoids duplicating measurements
+	glog.Infof("Clearing time range (%d - %d) for %s from database", importStart, importEnd, "fitnotes")
+	status, msg, err := mManager.DeleteTimeRangeForSource(importStart, importEnd, "fitnotes")
+	if err != nil {
+		glog.Errorf("%s %s: %v", logPrefix, msg, err)
+	} else {
+		// Save all models we just parsed
+		status, msg, err = mManager.CreateMultiple(measurements)
+		if err != nil {
+			glog.Errorf("%s %s: %v", logPrefix, msg, err)
+		}
+	}
+
+	c.JSON(status, gin.H{})
 	return
 }

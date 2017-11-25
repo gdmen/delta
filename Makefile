@@ -6,21 +6,30 @@ GOTEST=$(GOCMD) test
 GODEP=$(GOTEST) -i
 GOFMT=gofmt -w
 
-build: build_server
-
-build_server: src/server.go
-	$(GOBUILD) -o ./bin/server ./$^
-
-build_server_rpi: src/server.go
-	env GOOS=linux GOARCH=arm GOARM=5 $(GOBUILD) -o ./bin/server_rpi ./$^
+local: api_server
+	./bin/api_server > api_server.log 2>&1 &
+	cd src/ui && npm start
 
 test: test_api
 
 test_api: src/api
 	$(GOTEST) ./$^
 
-run_api: build
-	./bin/server > server.log 2>&1
+api_server: src/api_server.go
+	$(GOBUILD) -o ./bin/api_server ./$^
 
-run_ui:
-	cd src/ui && npm start
+api_server_pi: src/api_server.go
+	env GOOS=linux GOARCH=arm GOARM=5 $(GOBUILD) -o ./bin/api_server_pi ./$^
+
+ui:
+	cd src/ui && npm run build; cd -
+
+release: api_server_pi ui
+	mkdir -p ./bin/release
+	cp ./bin/api_server_pi ./bin/release
+	cp conf.json ./bin/release
+	cp -r release/* ./bin/release
+	cp -r src/ui/build ./bin/release/ui_server
+
+deploy: release
+	scp -r ./bin/release/* pi@10.0.0.174:./delta

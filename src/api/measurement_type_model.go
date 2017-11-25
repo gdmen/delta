@@ -19,7 +19,7 @@ const (
 	CreateMeasurementTypeSQL = `
 	INSERT INTO measurement_types(name, units) VALUES(?, ?);`
 	ExistsMeasurementTypeSQL = `
-	SELECT id FROM measurement_types WHERE name=? AND units=?;`
+	SELECT id FROM measurement_types WHERE name=?;`
 	UpdateMeasurementTypeSQL = `
 	UPDATE measurement_types SET name=?, units=? WHERE id=?;`
 	DeleteMeasurementTypeSQL = `
@@ -47,7 +47,7 @@ type MeasurementTypeManager struct {
 func (m *MeasurementTypeManager) Create(model *MeasurementType) (int, string, error) {
 	// Check for existence
 	var id int64
-	err := m.DB.QueryRow(ExistsMeasurementTypeSQL, model.Name, model.Units).Scan(&id)
+	err := m.DB.QueryRow(ExistsMeasurementTypeSQL, model.Name).Scan(&id)
 	if err == nil {
 		model.Id = id
 		return http.StatusCreated, "", nil

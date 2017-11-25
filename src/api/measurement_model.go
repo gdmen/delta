@@ -23,8 +23,11 @@ const (
 	);`
 	CreateMeasurementSQL = `
 	INSERT INTO measurements(measurement_type_id, value, repetitions, start_time, duration, data_source) VALUES(?, ?, ?, ?, ?, ?);`
-	ExistsMeasurementSQL = `
-	SELECT id FROM measurements WHERE measurement_type_id=? AND value=? AND repetitions=? AND start_time=? AND duration=? AND data_source=?;`
+	CreateMultipleMeasurementsSQL_A = `
+	INSERT INTO measurements(measurement_type_id, value, repetitions, start_time, duration, data_source) VALUES`
+	CreateMultipleMeasurementsSQL_B = `(?, ?, ?, ?, ?, ?)`
+	DeleteTimeRangeSQL              = `
+	DELETE FROM measurements WHERE start_time>=? AND start_time<=? AND data_source=?;`
 	UpdateMeasurementSQL = `
 	UPDATE measurements SET measurement_type_id=?, value=?, repetitions=?, start_time=?, duration=?, data_source=? WHERE id=?;`
 	DeleteMeasurementSQL = `
@@ -54,27 +57,41 @@ type MeasurementManager struct {
 }
 
 func (m *MeasurementManager) Create(model *Measurement) (int, string, error) {
-	// Check for existence
-	var id int64
-	err := m.DB.QueryRow(ExistsMeasurementSQL, model.MeasurementTypeId, model.Value, model.Repetitions, model.StartTime, model.Duration, model.DataSource).Scan(&id)
-	if err == nil {
-		model.Id = id
-		return http.StatusCreated, "", nil
-	}
-	// Doesn't exist, so try to add it
 	result, err := m.DB.Exec(CreateMeasurementSQL, model.MeasurementTypeId, model.Value, model.Repetitions, model.StartTime, model.Duration, model.DataSource)
 	if err != nil {
-		if strings.Contains(err.Error(), "UNIQUE constraint failed") {
-			msg := "That measurement already exits"
-			return http.StatusBadRequest, msg, err
-		}
 		msg := "Couldn't add measurement to database"
 		return http.StatusInternalServerError, msg, err
 	}
 	// Get the Id that was just auto-written to the database
 	// Ignore errors (if the database doesn't support LastInsertId)
-	id, _ = result.LastInsertId()
+	id, _ := result.LastInsertId()
 	model.Id = id
+	return http.StatusCreated, "", nil
+}
+
+func (m *MeasurementManager) DeleteTimeRangeForSource(start int64, end int64, source string) (int, string, error) {
+	_, err := m.DB.Exec(DeleteTimeRangeSQL, start, end, source)
+	if err != nil {
+		msg := fmt.Sprintf("Couldn't clear time range (%d - %d) for %s from database", start, end, source)
+		return http.StatusInternalServerError, msg, err
+	}
+	return http.StatusNoContent, "", nil
+}
+
+func (m *MeasurementManager) CreateMultiple(models []*Measurement) (int, string, error) {
+	sql := CreateMultipleMeasurementsSQL_A
+	sql += strings.Repeat(CreateMultipleMeasurementsSQL_B+",", len(models))
+	sql = sql[:len(sql)-1] + ";"
+	model_params := []interface{}{}
+	for _, model := range models {
+		model_params = append(model_params, model.MeasurementTypeId, model.Value, model.Repetitions, model.StartTime, model.Duration, model.DataSource)
+	}
+	// Try to add all the models at once
+	_, err := m.DB.Exec(sql, model_params...)
+	if err != nil {
+		msg := "Couldn't add measurement to database"
+		return http.StatusInternalServerError, msg, err
+	}
 	return http.StatusCreated, "", nil
 }
 
