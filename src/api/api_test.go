@@ -35,7 +35,7 @@ func TestMain(m *testing.M) {
 }
 
 func ResetTestApi(c *common.Config) {
-	connectStr := fmt.Sprintf("%s:%s@/?charset=utf8", c.MySQLUser, c.MySQLPass)
+	connectStr := fmt.Sprintf("%s:%s@tcp(%s:%s)/?charset=utf8", c.MySQLUser, c.MySQLPass, c.MySQLHost, c.MySQLPort)
 	db, err := sql.Open("mysql", connectStr)
 	if err != nil {
 		fmt.Printf("Couldn't connect to db: %v", err)
@@ -45,7 +45,7 @@ func ResetTestApi(c *common.Config) {
 	db.Exec("CREATE DATABASE delta_test;")
 	db.Close()
 	// Reconnect specifically to the test database
-	connectStr = fmt.Sprintf("%s:%s@/%s?charset=utf8", c.MySQLUser, c.MySQLPass, c.MySQLDatabase)
+	connectStr = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8", c.MySQLUser, c.MySQLPass, c.MySQLHost, c.MySQLPort, c.MySQLDatabase)
 	db, err = sql.Open("mysql", connectStr)
 	if err != nil {
 		fmt.Printf("Couldn't connect to db: %v", err)

@@ -14,7 +14,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	connectStr := fmt.Sprintf("%s:%s@/%s?charset=utf8", c.MySQLUser, c.MySQLPass, c.MySQLDatabase)
+	connectStr := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8", c.MySQLUser, c.MySQLPass, c.MySQLHost, c.MySQLPort, c.MySQLDatabase)
 	db, err := sql.Open("mysql", connectStr)
 	if err != nil {
 		log.Fatal(err)

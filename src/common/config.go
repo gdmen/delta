@@ -6,9 +6,11 @@ import (
 )
 
 type Config struct {
+	MySQLHost     string `json:"mysql_host"`
+	MySQLPort     string `json:"mysql_port"`
+	MySQLDatabase string `json:"mysql_database"`
 	MySQLUser     string `json:"mysql_user"`
 	MySQLPass     string `json:"mysql_pass"`
-	MySQLDatabase string `json:"mysql_database"`
 }
 
 func ReadConfig(path string) (*Config, error) {
