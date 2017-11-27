@@ -2,10 +2,10 @@ body {
 }
 
 .line-graph-view {
-	height: 12em;
+	height: 15em;
 }
 .column-graph-view {
-	height: 12em;
+	height: 15em;
 }
 .solid-gauge-view {
 	height: 18em;
@@ -31,14 +31,14 @@ body {
 }
 
 #powerlifting-graphs {
-	width: 33.3333%;
+	width: 40%;
 	float: left;
 }
 #gauges {
-	width: 33.3333%;
+	width: 20%;
 	float: left;
 }
 #training-graphs {
-	width: 33.3333%;
+	width: 40%;
 	float: left;
 }
