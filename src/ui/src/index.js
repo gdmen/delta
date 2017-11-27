@@ -13,29 +13,31 @@ HighchartsDrilldown(Highcharts);
 HighchartsMore(Highcharts);
 HighchartsSolidGauge(Highcharts);
 
-const NotFound = () =>
+const NotFound = () => (
 	<div>
 		<h3>404 page not found</h3>
 	</div>
+)
 
-
+var conf = require('./conf');
+const ApiHost = conf.api_host;
 
 class UploadView extends React.Component {
 	render() {
 		return (
 				<div>
 					<h1>fitnotes</h1>
-					<form action="http://localhost:8080/api/v1/import/fitnotes" method="post" encType="multipart/form-data">
+					<form action={ApiHost + "/api/v1/import/fitnotes"} method="post" encType="multipart/form-data">
 					<input type="file" name="files" multiple />
 					<input type="submit" value="Submit" />
 					</form>
 					<h1>fitocracy</h1>
-					<form action="http://localhost:8080/api/v1/import/fitocracy" method="post" encType="multipart/form-data">
+					<form action={ApiHost + "/api/v1/import/fitocracy"} method="post" encType="multipart/form-data">
 					<input type="file" name="files" multiple />
 					<input type="submit" value="Submit" />
 					</form>
 					<h1>strava</h1>
-					<form action="http://localhost:8080/api/v1/import/strava" method="post" encType="multipart/form-data">
+					<form action={ApiHost + "/api/v1/import/strava"} method="post" encType="multipart/form-data">
 					<input type="file" name="files" multiple />
 					<input type="submit" value="Submit" />
 					</form>
@@ -92,6 +94,13 @@ class LineGraphView extends React.Component {
 			},
 			legend: {
 				enabled: false,
+			},
+			plotOptions: {
+				series: {
+					marker: {
+						enabled: false
+					}
+				}
 			},
 			series: [{
 				name: this.props.titleX,
@@ -346,7 +355,7 @@ class DashboardView extends React.Component {
 			<div id="dashboard">
 				<div id="powerlifting-graphs">
 					<LineGraphView
-						host="http://localhost:8080"
+						host={ApiHost}
 						url='/api/v1/data/maxes?fields=[{"name":"Flat Barbell Bench Press"},{"name":"Barbell Back Squat"},{"name":"Conventional Barbell Deadlift"}]&increment=3'
 						title="Total"
 						titleX="total"
@@ -356,7 +365,7 @@ class DashboardView extends React.Component {
 						bandThree="1000"
 					/>
 					<LineGraphView
-						host="http://localhost:8080"
+						host={ApiHost}
 						url='/api/v1/data/maxes?fields=[{"name":"Flat Barbell Bench Press"}]&increment=3'
 						title="Bench"
 						titleX="max bench"
@@ -366,7 +375,7 @@ class DashboardView extends React.Component {
 						bandThree="315"
 					/>
 					<LineGraphView
-						host="http://localhost:8080"
+						host={ApiHost}
 						url='/api/v1/data/maxes?fields=[{"name":"Barbell Back Squat"}]&increment=3'
 						title="Squat"
 						titleX="max squat"
@@ -376,7 +385,7 @@ class DashboardView extends React.Component {
 						bandThree="405"
 					/>
 					<LineGraphView
-						host="http://localhost:8080"
+						host={ApiHost}
 						url='/api/v1/data/maxes?fields=[{"name":"Conventional Barbell Deadlift"}]&increment=3'
 						title="Deadlift"
 						titleX="max deadlift"
@@ -388,14 +397,14 @@ class DashboardView extends React.Component {
 				</div>
 				<div id="gauges">
 					<SolidGaugeView
-						host="http://localhost:8080"
+						host={ApiHost}
 						url='/api/v1/data/maxes?fields=[{"name":"Flat Barbell Bench Press"},{"name":"Barbell Back Squat"},{"name":"Conventional Barbell Deadlift"}]&increment=3&maxOnly=1'
 						title="Powerlifting Total"
 						units="lbs"
 						maxY="1000"
 					/>
 					<SolidGaugeView
-						host="http://localhost:8080"
+						host={ApiHost}
 						url='/api/v1/data/drilldown?fields=[{"name":"Brazilian Jiu-Jitsu","attr":2},{"name":"Judo","attr":2},{"name":"Wrestling","attr":2}]&increment=3&maxOnly=1'
 						title="Mat Time"
 						units="hrs"
@@ -404,7 +413,7 @@ class DashboardView extends React.Component {
 				</div>
 				<div id="training-graphs">
 					<ColumnGraphView
-						host="http://localhost:8080"
+						host={ApiHost}
 						url='/api/v1/data/drilldown?fields=[{"name":"Brazilian Jiu-Jitsu","attr":2},{"name":"Judo","attr":2},{"name":"Wrestling","attr":2}]&increment=3'
 						title="Grappling"
 						titleX="hours grappling"
@@ -414,7 +423,7 @@ class DashboardView extends React.Component {
 						bandThree="32"
 					/>
 					<ColumnGraphView
-						host="http://localhost:8080"
+						host={ApiHost}
 						url='/api/v1/data/drilldown?fields=[{"name":"Road Cycling","attr":1}]&increment=3'
 						title="Biking"
 						titleX="miles biked"

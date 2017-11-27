@@ -26,10 +26,11 @@ ui:
 
 release: api_server_pi ui
 	mkdir -p ./bin/release
+	rm -r ./bin/release/*
 	cp ./bin/api_server_pi ./bin/release
-	cp conf.json ./bin/release
 	cp -r release/* ./bin/release
 	cp -r src/ui/build ./bin/release/ui_server
 
-deploy: release
+deploy:
+	ssh -t pi@10.0.0.174 "rm -rf ./delta/*"
 	scp -r ./bin/release/* pi@10.0.0.174:./delta
