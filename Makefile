@@ -6,7 +6,7 @@ GOTEST=$(GOCMD) test
 GODEP=$(GOTEST) -i
 GOFMT=gofmt -w
 
-local: api_server
+local: ui api_server
 	cd src/ui && npm start &
 	./bin/api_server > api_server.log 2>&1
 

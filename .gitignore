@@ -1,6 +1,10 @@
 # log files
 *.log
 
+# conf files
+conf.json
+test_conf.json
+
 # Project binaries
 bin/
 
